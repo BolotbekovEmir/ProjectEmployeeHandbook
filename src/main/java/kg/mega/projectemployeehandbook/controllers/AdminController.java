@@ -2,13 +2,9 @@ package kg.mega.projectemployeehandbook.controllers;
 
 import kg.mega.projectemployeehandbook.errors.CreateAdminException;
 import kg.mega.projectemployeehandbook.errors.EditAdminException;
-import kg.mega.projectemployeehandbook.models.dto.CreateAdminDTO;
-import kg.mega.projectemployeehandbook.models.dto.EditAdminDTO;
-import kg.mega.projectemployeehandbook.models.dto.GetAdminDTO;
+import kg.mega.projectemployeehandbook.models.dto.*;
 import kg.mega.projectemployeehandbook.models.responses.RestResponse;
-import kg.mega.projectemployeehandbook.services.admin.CreateAdminService;
-import kg.mega.projectemployeehandbook.services.admin.EditAdminService;
-import kg.mega.projectemployeehandbook.services.admin.SearchAdminService;
+import kg.mega.projectemployeehandbook.services.admin.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +20,11 @@ import static lombok.AccessLevel.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class AdminController {
-    final CreateAdminService createAdminService;
-    final SearchAdminService searchAdminService;
-    final EditAdminService   editAdminService;
+    final ChangeAdminPasswordService changeAdminPasswordService;
+    final CreateAdminService         createAdminService;
+    final SearchAdminService         searchAdminService;
+    final AuthAdminService           authAdminService;
+    final EditAdminService           editAdminService;
 
     @PostMapping("create")
     public RestResponse<CreateAdminException> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
@@ -41,6 +39,16 @@ public class AdminController {
     @GetMapping("findBy")
     public Set<GetAdminDTO> search(@RequestParam String searchField) {
         return searchAdminService.searchAdmins(searchField);
+    }
+
+    @PatchMapping("changePassword")
+    public RestResponse<EditAdminException> changePassword(@RequestBody @Valid ChangeAdminPasswordDTO changeAdminPasswordDTO) {
+        return changeAdminPasswordService.changeAdminPassword(changeAdminPasswordDTO);
+    }
+
+    @GetMapping("auth")
+    public TokenAdminDTO adminAuth(@RequestBody @Valid AuthAdminDTO authAdminDTO) {
+        return authAdminService.adminAuth(authAdminDTO);
     }
 
 }
