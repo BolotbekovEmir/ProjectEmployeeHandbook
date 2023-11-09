@@ -1,7 +1,7 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
-import kg.mega.projectemployeehandbook.models.dto.GetAdminDTO;
+import kg.mega.projectemployeehandbook.models.dto.admin.GetAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.enums.AdminRole;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;

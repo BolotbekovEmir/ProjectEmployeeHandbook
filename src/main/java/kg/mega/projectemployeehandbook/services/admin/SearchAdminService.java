@@ -1,6 +1,6 @@
 package kg.mega.projectemployeehandbook.services.admin;
 
-import kg.mega.projectemployeehandbook.models.dto.GetAdminDTO;
+import kg.mega.projectemployeehandbook.models.dto.admin.GetAdminDTO;
 
 import java.util.Set;
 

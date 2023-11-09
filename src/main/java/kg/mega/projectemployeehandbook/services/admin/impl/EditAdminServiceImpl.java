@@ -1,9 +1,9 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
-import kg.mega.projectemployeehandbook.errors.EditAdminException;
+import kg.mega.projectemployeehandbook.errors.EditEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
-import kg.mega.projectemployeehandbook.models.dto.EditAdminDTO;
+import kg.mega.projectemployeehandbook.models.dto.admin.EditAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
@@ -32,11 +32,11 @@ public class EditAdminServiceImpl implements EditAdminService {
     final AdminRepository         adminRepository;
     final LoggingService          loggingService;
 
-    final RestResponse<EditAdminException> response = new RestResponse<>();
+    final RestResponse<EditEntityException> response = new RestResponse<>();
 
     @Override
     @Transactional
-    public RestResponse<EditAdminException> editAdmin(EditAdminDTO editAdminDTO) {
+    public RestResponse<EditEntityException> editAdmin(EditAdminDTO editAdminDTO) {
         this.response.setErrorDescriptions(new ArrayList<>());
 
         String
@@ -61,7 +61,7 @@ public class EditAdminServiceImpl implements EditAdminService {
         adminRepository.save(admin);
 
         String successMessage = format(InfoDescription.EDIT_ADMIN_FORMAT, searchedAdminName);
-        loggingService.logInfoWithTime(successMessage);
+        loggingService.logInfo(successMessage);
         this.response.setHttpResponse(OK, OK.value());
 
         return this.response;
@@ -74,7 +74,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             setErrorResponse(ErrorDescription.ADMIN_NOT_FOUND);
         }
 
-        return optionalAdmin.orElseThrow(EditAdminException::new);
+        return optionalAdmin.orElseThrow(EditEntityException::new);
     }
 
     private void updateAdminName(Admin admin, String newAdminName) {
@@ -133,7 +133,7 @@ public class EditAdminServiceImpl implements EditAdminService {
     private void setErrorResponse(String message) {
         this.response.setHttpResponse(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value());
         this.response.addErrorDescription(message);
-        loggingService.logErrorWithTime(message);
-        throw new EditAdminException(this.response.getErrorDescriptions().toString());
+        loggingService.logError(message);
+        throw new EditEntityException(this.response.getErrorDescriptions().toString());
     }
 }

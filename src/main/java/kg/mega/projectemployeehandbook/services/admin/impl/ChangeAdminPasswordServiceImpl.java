@@ -1,7 +1,7 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
-import kg.mega.projectemployeehandbook.errors.EditAdminException;
-import kg.mega.projectemployeehandbook.models.dto.ChangeAdminPasswordDTO;
+import kg.mega.projectemployeehandbook.errors.EditEntityException;
+import kg.mega.projectemployeehandbook.models.dto.admin.ChangeAdminPasswordDTO;
 import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.services.admin.ChangeAdminPasswordService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +17,10 @@ import static org.springframework.http.HttpStatus.*;
 public class ChangeAdminPasswordServiceImpl implements ChangeAdminPasswordService {
 //    final AdminRepository adminRepository;
 
-    final RestResponse<EditAdminException> response = new RestResponse<>();
+    final RestResponse<EditEntityException> response = new RestResponse<>();
 
     @Override
-    public RestResponse<EditAdminException> changeAdminPassword(ChangeAdminPasswordDTO changeAdminPasswordDTO) {
+    public RestResponse<EditEntityException> changeAdminPassword(ChangeAdminPasswordDTO changeAdminPasswordDTO) {
         validatePasswords(changeAdminPasswordDTO.getNewAdminPassword(), changeAdminPasswordDTO.getConfirmNewAdminPassword());
 
         // TODO: 08.11.2023 UserDetail / JWT / Encoder
@@ -32,7 +32,7 @@ public class ChangeAdminPasswordServiceImpl implements ChangeAdminPasswordServic
     private void validatePasswords(String password, String confirmPassword) {
         if (!password.equals(confirmPassword)) {
             this.response.setHttpResponse(BAD_REQUEST, BAD_REQUEST.value());
-            throw new EditAdminException(this.response.getErrorDescriptions().toString());
+            throw new EditEntityException(this.response.getErrorDescriptions().toString());
         }
     }
 }

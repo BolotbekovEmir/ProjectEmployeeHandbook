@@ -1,10 +1,10 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
-import kg.mega.projectemployeehandbook.errors.CreateAdminException;
+import kg.mega.projectemployeehandbook.errors.CreateEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
-import kg.mega.projectemployeehandbook.models.dto.CreateAdminDTO;
+import kg.mega.projectemployeehandbook.models.dto.admin.CreateAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
@@ -31,17 +31,17 @@ public class CreateAdminServiceImpl implements CreateAdminService {
     final LoggingService          loggingService;
     final MapperConfiguration     mapper;
 
-    final RestResponse<CreateAdminException> response = new RestResponse<>();
+    final RestResponse<CreateEntityException> response = new RestResponse<>();
 
     @Override
     @Transactional
-    public RestResponse<CreateAdminException> createAdmin(CreateAdminDTO createAdminDTO) {
+    public RestResponse<CreateEntityException> createAdmin(CreateAdminDTO createAdminDTO) {
         this.response.setErrorDescriptions(new ArrayList<>());
 
         if (!isValidCreateAdminData(createAdminDTO)) {
             this.response.setHttpResponse(BAD_REQUEST, BAD_REQUEST.value());
-            loggingService.logErrorWithTime(String.format(ErrorDescription.ADMIN_CREATE_INVALID_FORMAT, this.response.getErrorDescriptions()));
-            throw new CreateAdminException(this.response.getErrorDescriptions().toString());
+            loggingService.logError(String.format(ErrorDescription.ADMIN_CREATE_INVALID_FORMAT, this.response.getErrorDescriptions()));
+            throw new CreateEntityException(this.response.getErrorDescriptions().toString());
         }
 
         Admin admin = mapper.getMapper().map(createAdminDTO, Admin.class);
@@ -50,7 +50,7 @@ public class CreateAdminServiceImpl implements CreateAdminService {
         admin.setAdminRole(ADMIN);
 
         adminRepository.save(admin);
-        loggingService.logInfoWithTime(String.format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName()));
+        loggingService.logInfo(String.format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName()));
 
         this.response.setHttpResponse(CREATED, CREATED.value());
 

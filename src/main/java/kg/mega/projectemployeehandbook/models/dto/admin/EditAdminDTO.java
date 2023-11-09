@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.models.dto;
+package kg.mega.projectemployeehandbook.models.dto.admin;
 
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import lombok.Data;

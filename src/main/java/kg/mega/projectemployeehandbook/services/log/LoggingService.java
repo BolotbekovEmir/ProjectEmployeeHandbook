@@ -2,8 +2,8 @@ package kg.mega.projectemployeehandbook.services.log;
 
 public interface LoggingService {
 
-    void logInfoWithTime(String message);
+    void logInfo(String message);
 
-    void logErrorWithTime(String message);
+    void logError(String message);
 
 }

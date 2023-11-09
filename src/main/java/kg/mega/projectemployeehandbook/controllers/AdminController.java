@@ -1,8 +1,8 @@
 package kg.mega.projectemployeehandbook.controllers;
 
-import kg.mega.projectemployeehandbook.errors.CreateAdminException;
-import kg.mega.projectemployeehandbook.errors.EditAdminException;
-import kg.mega.projectemployeehandbook.models.dto.*;
+import kg.mega.projectemployeehandbook.errors.CreateEntityException;
+import kg.mega.projectemployeehandbook.errors.EditEntityException;
+import kg.mega.projectemployeehandbook.models.dto.admin.*;
 import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.services.admin.*;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +27,12 @@ public class AdminController {
     final EditAdminService           editAdminService;
 
     @PostMapping("create")
-    public RestResponse<CreateAdminException> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
+    public RestResponse<CreateEntityException> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
         return createAdminService.createAdmin(createAdminDTO);
     }
 
     @PatchMapping("edit")
-    public RestResponse<EditAdminException> edit(@RequestBody @Valid EditAdminDTO editAdminDTO) {
+    public RestResponse<EditEntityException> edit(@RequestBody @Valid EditAdminDTO editAdminDTO) {
         return editAdminService.editAdmin(editAdminDTO);
     }
 
@@ -42,7 +42,7 @@ public class AdminController {
     }
 
     @PatchMapping("changePassword")
-    public RestResponse<EditAdminException> changePassword(@RequestBody @Valid ChangeAdminPasswordDTO changeAdminPasswordDTO) {
+    public RestResponse<EditEntityException> changePassword(@RequestBody @Valid ChangeAdminPasswordDTO changeAdminPasswordDTO) {
         return changeAdminPasswordService.changeAdminPassword(changeAdminPasswordDTO);
     }
 
