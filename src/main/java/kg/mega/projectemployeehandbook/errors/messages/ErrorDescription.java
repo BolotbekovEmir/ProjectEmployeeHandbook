@@ -29,14 +29,22 @@ public class ErrorDescription {
         POSITION_NULL = "Данной позиции в базе не существует",
         MAPPING_ERROR = "Ошибка при маппинге. Возвращен 'null'",
         CREATE_ENTITY_ERROR = "Ошибка при создании сущности",
-        STRUCTURE_NULL = "Данной структуры не существует",
+        STRUCTURE_ID_NOT_FOUND = "Структуры с таким номером не найдено",
         STRUCTURE_TYPE_NOT_FOUND = "Тип структуры с таким номером не найдено",
         STRUCTURE_TYPE_UNIQUE = "Тип структуры с таким именем уже существует",
         STRUCTURE_UNIQUE = "Структура с таким именем уже существует",
         STRUCTURE_TYPE_ALREADY_ACTIVE = "Тип структуры уже активен",
         STRUCTURE_TYPE_ALREADY_INACTIVE = "Тип структруры уже неактивен",
+        STRUCTURE_ALREADY_ACTIVE = "Структура уже активена",
+        STRUCTURE_ALREADY_INACTIVE = "Структрура уже неактивена",
         ENTITY_NOT_FOUND = "Сущность не найдена",
         EDIT_ENTITY_ERROR = "Невозможно изменить сущность",
-        STRUCTURE_TYPE_ID_NOT_FOUND = "Тип структуры с данным номером не найдено";
+        STRUCTURE_TYPE_ID_NOT_FOUND = "Тип структуры с данным номером не найдено",
+        STRUCTURE_TYPE_EDIT_ERROR_FORMAT = "Неудачная попытка изменить тип структуры: %s",
+        STRUCTURE_NAME_ALREADY_HAVE_THIS_NAME = "Новое имя структуры соответсвует нынешнему",
+        POSITION_ID_NOT_FOUND = "Позиции с таким номером не найдено",
+        POSITION_NAME_ALREADY_HAVE_THIS_NAME = "Новое название позиции соответствует нынешнему",
+        POSITION_ALREADY_INACTIVE = "Позиция уже не активна",
+        POSITION_ALREADY_ACTIVE = "Позиция уже активна";
 
 }

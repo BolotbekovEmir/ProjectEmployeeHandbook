@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.models.dto.structure;
+package kg.mega.projectemployeehandbook.models.dto.structuretype;
 
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +9,7 @@ import static lombok.AccessLevel.*;
 @FieldDefaults(level = PRIVATE)
 public class GetStructureTypeDTO {
 
-    long structureTypeId;
+    Long structureTypeId;
 
     String structureTypeName;
 

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
+import static java.lang.String.*;
 import static kg.mega.projectemployeehandbook.models.enums.AdminRole.*;
 import static lombok.AccessLevel.*;
 import static org.springframework.http.HttpStatus.*;
@@ -39,8 +40,6 @@ public class CreateAdminServiceImpl implements CreateAdminService {
         this.response.setErrorDescriptions(new ArrayList<>());
 
         if (!isValidCreateAdminData(createAdminDTO)) {
-            this.response.setHttpResponse(BAD_REQUEST, BAD_REQUEST.value());
-            loggingService.logError(String.format(ErrorDescription.ADMIN_CREATE_INVALID_FORMAT, this.response.getErrorDescriptions()));
             throw new CreateEntityException(this.response.getErrorDescriptions().toString());
         }
 
@@ -50,35 +49,40 @@ public class CreateAdminServiceImpl implements CreateAdminService {
         admin.setAdminRole(ADMIN);
 
         adminRepository.save(admin);
-        loggingService.logInfo(String.format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName()));
 
         this.response.setHttpResponse(CREATED, CREATED.value());
+
+        loggingService.logInfo(
+            format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName())
+        );
 
         return this.response;
     }
 
     private boolean isValidCreateAdminData(CreateAdminDTO createAdminDTO) {
+        boolean result = true;
+
         if (!validationUniqueService.isUniqueAdminName(createAdminDTO.getAdminName())) {
             this.response.addErrorDescription(ErrorDescription.ADMIN_NAME_UNIQUE);
-            return false;
+            result = false;
         }
 
         if (!createAdminDTO.getPersonalNumber().isBlank()) {
             if (!validationUniqueService.isUniqueAdminPersonalNumber(createAdminDTO.getPersonalNumber())) {
                 this.response.addErrorDescription(ErrorDescription.PERSONAL_NUMBER_UNIQUE);
-                return false;
+                result = false;
             }
         } else {
             this.response.addErrorDescription(ErrorDescription.PERSONAL_NUMBER_PATTERN);
-            return false;
+            result = false;
         }
 
         if (!createAdminDTO.getPassword().equals(createAdminDTO.getConfirmPassword())) {
             this.response.addErrorDescription(ErrorDescription.PASSWORDS_EQUAL);
-            return false;
+            result = false;
         }
 
-        return true;
+        return result;
     }
 
 }

@@ -7,10 +7,17 @@ import static lombok.AccessLevel.*;
 
 @Data
 @FieldDefaults(level = PRIVATE)
-public class CreateStructureTypeDTO {
+public class EditStructureDTO {
 
-    String structureTypeName;
+    Long
+        structureId,
+        newMasterId,
+        newStructureTypeId;
 
-    boolean active;
+    String newStructureName;
+
+    boolean
+        disable,
+        enable;
 
 }

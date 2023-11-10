@@ -43,7 +43,8 @@ public class SearchAdminServiceImpl implements SearchAdminService {
         searchResult.addAll(adminsByPersonalNumber);
 
         return searchResult.stream()
-            .map(admin -> mapper.getMapper().map(admin, GetAdminDTO.class))
+            .map(admin -> mapper.getMapper()
+                .map(admin, GetAdminDTO.class))
             .collect(Collectors.toSet());
     }
 

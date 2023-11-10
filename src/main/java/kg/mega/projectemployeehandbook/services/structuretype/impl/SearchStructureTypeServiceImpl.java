@@ -1,12 +1,12 @@
-package kg.mega.projectemployeehandbook.services.structure.impl;
+package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
 import kg.mega.projectemployeehandbook.errors.GetEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.dto.structure.GetStructureTypeDTO;
+import kg.mega.projectemployeehandbook.models.dto.structuretype.GetStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.services.structure.SearchStructureTypeService;
+import kg.mega.projectemployeehandbook.services.structuretype.SearchStructureTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,9 @@ public class SearchStructureTypeServiceImpl implements SearchStructureTypeServic
 
     @Override
     public Set<GetStructureTypeDTO> searchStructureType(String searchField) {
+        if (searchField.isBlank()) {
+            return mapResult(structureTypeRepository.findAllByActiveIsTrue());
+        }
 
         Set<StructureType>
             structureTypesByName = structureTypeRepository.findAllByStructureTypeNameContainsIgnoreCaseAndActiveIsTrue(searchField),
@@ -38,9 +41,17 @@ public class SearchStructureTypeServiceImpl implements SearchStructureTypeServic
             );
             resultSearch.add(structureTypeFindById);
         } catch (NumberFormatException e) {
-            // Игнорируется исключение, так как searchField не является числом.
+            // Игнорируется исключение, так как searchField не является числом (id).
         }
 
-        return resultSearch.stream().map(e -> mapper.getMapper().map(e, GetStructureTypeDTO.class)).collect(Collectors.toSet());
+        return mapResult(resultSearch);
     }
+
+    private Set<GetStructureTypeDTO> mapResult(Set<StructureType> structureTypes) {
+        return structureTypes.stream()
+            .map(e -> mapper.getMapper()
+                .map(e, GetStructureTypeDTO.class))
+            .collect(Collectors.toSet());
+    }
+
 }

@@ -11,6 +11,6 @@ public interface StructureTypeRepository extends JpaRepository<StructureType, Lo
 
     Set<StructureType> findAllByStructureTypeNameContainsIgnoreCaseAndActiveIsTrue(String structureTypeName);
 
-
+    Set<StructureType> findAllByActiveIsTrue();
 
 }

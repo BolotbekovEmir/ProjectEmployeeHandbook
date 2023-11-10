@@ -16,7 +16,7 @@ import static lombok.AccessLevel.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = PRIVATE)
-public class RestResponse<E extends Exception> {
+public class RestResponse<E> {
     HttpStatus httpStatus;
     E response;
     int statusCode;

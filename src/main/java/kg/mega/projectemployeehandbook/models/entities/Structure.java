@@ -33,4 +33,10 @@ public class Structure {
     @Column(nullable = false)
     Boolean active;
 
+    public Structure(Structure master, StructureType structureType, String structureName, Boolean active) {
+        this.master = master;
+        this.structureType = structureType;
+        this.structureName = structureName;
+        this.active = active;
+    }
 }

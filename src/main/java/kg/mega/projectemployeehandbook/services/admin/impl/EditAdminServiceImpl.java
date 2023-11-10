@@ -1,7 +1,6 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
 import kg.mega.projectemployeehandbook.errors.EditEntityException;
-import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.admin.EditAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
@@ -12,7 +11,6 @@ import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,9 +58,11 @@ public class EditAdminServiceImpl implements EditAdminService {
 
         adminRepository.save(admin);
 
-        String successMessage = format(InfoDescription.EDIT_ADMIN_FORMAT, searchedAdminName);
-        loggingService.logInfo(successMessage);
         this.response.setHttpResponse(OK, OK.value());
+
+        loggingService.logInfo(
+            format(InfoDescription.EDIT_ADMIN_FORMAT, searchedAdminName)
+        );
 
         return this.response;
     }
@@ -71,7 +71,7 @@ public class EditAdminServiceImpl implements EditAdminService {
         Optional<Admin> optionalAdmin = adminRepository.findByAdminName(adminName);
 
         if (optionalAdmin.isEmpty()) {
-            setErrorResponse(ErrorDescription.ADMIN_NOT_FOUND);
+            setErrorResponse();
         }
 
         return optionalAdmin.orElseThrow(EditEntityException::new);
@@ -82,7 +82,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             if (validationUniqueService.isUniqueAdminName(newAdminName)) {
                 admin.setAdminName(newAdminName);
             } else {
-                setErrorResponse(ErrorDescription.ADMIN_NAME_UNIQUE);
+                setErrorResponse();
             }
         }
     }
@@ -93,7 +93,7 @@ public class EditAdminServiceImpl implements EditAdminService {
                 admin.setPersonalNumber(personalNumber);
             } else {
                 if (!personalNumber.equals(admin.getPersonalNumber())) {
-                    setErrorResponse(ErrorDescription.PERSONAL_NUMBER_UNIQUE);
+                    setErrorResponse();
                 }
             }
         }
@@ -105,7 +105,7 @@ public class EditAdminServiceImpl implements EditAdminService {
                 // TODO: 07.11.2023 encoder
                 admin.setPassword(password);
             } else {
-                setErrorResponse(ErrorDescription.PASSWORDS_EQUAL);
+                setErrorResponse();
             }
         }
     }
@@ -115,7 +115,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             if (!admin.getAdminRole().equals(DISABLE)) {
                 admin.setAdminRole(DISABLE);
             } else {
-                setErrorResponse(ErrorDescription.ADMIN_DISABLE);
+                setErrorResponse();
             }
         }
     }
@@ -125,15 +125,15 @@ public class EditAdminServiceImpl implements EditAdminService {
             if (!admin.getAdminRole().equals(ADMIN)) {
                 admin.setAdminRole(ADMIN);
             } else {
-                setErrorResponse(ErrorDescription.ADMIN_ENABLE);
+                setErrorResponse();
             }
         }
     }
 
-    private void setErrorResponse(String message) {
-        this.response.setHttpResponse(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value());
-        this.response.addErrorDescription(message);
-        loggingService.logError(message);
-        throw new EditEntityException(this.response.getErrorDescriptions().toString());
+    private void setErrorResponse() {
+        throw new EditEntityException(
+            this.response.getErrorDescriptions().toString()
+        );
     }
+
 }

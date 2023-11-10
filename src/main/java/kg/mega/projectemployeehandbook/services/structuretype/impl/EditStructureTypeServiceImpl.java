@@ -1,12 +1,14 @@
-package kg.mega.projectemployeehandbook.services.structure.impl;
+package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
 import kg.mega.projectemployeehandbook.errors.EditEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.dto.structure.EditStructureTypeDTO;
+import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
+import kg.mega.projectemployeehandbook.models.dto.structuretype.EditStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.services.structure.EditStructureTypeService;
+import kg.mega.projectemployeehandbook.services.log.LoggingService;
+import kg.mega.projectemployeehandbook.services.structuretype.EditStructureTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static java.lang.String.*;
 import static lombok.AccessLevel.*;
 import static org.springframework.http.HttpStatus.*;
 
@@ -22,6 +25,7 @@ import static org.springframework.http.HttpStatus.*;
 @FieldDefaults(level = PRIVATE)
 public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     final StructureTypeRepository structureTypeRepository;
+    final LoggingService          loggingService;
 
     final RestResponse<EditEntityException> response = new RestResponse<>();
 
@@ -38,6 +42,9 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         structureTypeRepository.save(structureType);
 
         this.response.setHttpResponse(OK, OK.value());
+        loggingService.logInfo(
+            format(InfoDescription.EDIT_STRUCTURE_TYPE_FORMAT, structureType.getId())
+        );
 
         return this.response;
     }
@@ -53,7 +60,8 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
             if (structureType.getActive()) {
                 structureType.setActive(false);
             } else {
-                setErrorResponse(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE);
+                this.response.addErrorDescription(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE);
+                setErrorResponse();
             }
         }
     }
@@ -63,7 +71,8 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
             if (!structureType.getActive()) {
                 structureType.setActive(true);
             } else {
-                setErrorResponse(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE);
+                this.response.addErrorDescription(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE);
+                setErrorResponse();
             }
         }
     }
@@ -72,15 +81,15 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         Optional<StructureType> optionalStructureType = structureTypeRepository.findById(structureTypeId);
 
         if (optionalStructureType.isEmpty()) {
-            setErrorResponse(ErrorDescription.STRUCTURE_TYPE_NOT_FOUND);
+            this.response.addErrorDescription(ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND);
+            setErrorResponse();
         }
 
         return optionalStructureType.orElseThrow(EditEntityException::new);
     }
 
-    private void setErrorResponse(String message) {
-        this.response.setHttpResponse(BAD_REQUEST, BAD_REQUEST.value());
-        this.response.addErrorDescription(message);
+    private void setErrorResponse() {
         throw new EditEntityException(this.response.getErrorDescriptions().toString());
     }
+
 }

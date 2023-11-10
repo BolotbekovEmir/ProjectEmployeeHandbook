@@ -23,7 +23,7 @@ public class ChangeAdminPasswordServiceImpl implements ChangeAdminPasswordServic
     public RestResponse<EditEntityException> changeAdminPassword(ChangeAdminPasswordDTO changeAdminPasswordDTO) {
         validatePasswords(changeAdminPasswordDTO.getNewAdminPassword(), changeAdminPasswordDTO.getConfirmNewAdminPassword());
 
-        // TODO: 08.11.2023 UserDetail / JWT / Encoder
+        // TODO: 08.11.2023 UserDetails / JWT / Encoder
 
         this.response.setHttpResponse(OK, OK.value());
         return this.response;

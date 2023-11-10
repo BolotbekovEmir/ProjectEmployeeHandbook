@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.models.dto.structure;
+package kg.mega.projectemployeehandbook.models.dto.position;
 
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -7,11 +7,13 @@ import static lombok.AccessLevel.*;
 
 @Data
 @FieldDefaults(level = PRIVATE)
-public class EditStructureTypeDTO {
+public class EditPositionDTO {
 
-    long structureTypeId;
+    Long
+        editedPositionId,
+        newMasterId;
 
-    String newStructureTypeName;
+    String newPositionName;
 
     boolean
         disable,
