@@ -27,15 +27,14 @@ public class SearchAdminServiceImpl implements SearchAdminService {
     @Override
     public Set<GetAdminDTO> searchAdmins(String searchField) {
         Set<Admin>
-            adminsByName = adminRepository.findAllByAdminNameContainsIgnoreCase(searchField),
+            adminsByName           = adminRepository.findAllByAdminNameContainsIgnoreCase(searchField),
             adminsByPersonalNumber = adminRepository.findAllByPersonalNumber(searchField),
-            adminsByRole,
-            searchResult = new HashSet<>();
+            searchResult           = new HashSet<>();
 
-        AdminRole adminRole = findByRole(searchField);
+        AdminRole adminRole = findByRoleName(searchField);
 
         if (adminRole != null) {
-            adminsByRole = adminRepository.findAllByAdminRole(adminRole);
+            Set<Admin> adminsByRole = adminRepository.findAllByAdminRole(adminRole);
             searchResult.addAll(adminsByRole);
         }
 
@@ -48,7 +47,7 @@ public class SearchAdminServiceImpl implements SearchAdminService {
             .collect(Collectors.toSet());
     }
 
-    private AdminRole findByRole(String roleName) {
+    private AdminRole findByRoleName(String roleName) {
         String currentSearchField = roleName.toUpperCase();
 
         return Arrays.stream(AdminRole.values())
@@ -56,5 +55,4 @@ public class SearchAdminServiceImpl implements SearchAdminService {
             .findFirst()
             .orElse(null);
     }
-
 }

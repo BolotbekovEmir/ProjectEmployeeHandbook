@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.models.dto;
+package kg.mega.projectemployeehandbook.models.dto.position;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

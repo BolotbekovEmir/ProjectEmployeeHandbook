@@ -1,12 +1,13 @@
 package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
-import kg.mega.projectemployeehandbook.errors.GetEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.GetStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
 import kg.mega.projectemployeehandbook.services.structuretype.SearchStructureTypeService;
+import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import static lombok.AccessLevel.*;
 @FieldDefaults(level = PRIVATE)
 public class SearchStructureTypeServiceImpl implements SearchStructureTypeService {
     final StructureTypeRepository structureTypeRepository;
+    final CommonRepositoryUtil    commonRepositoryUtil;
     final MapperConfiguration     mapper;
 
     @Override
@@ -36,12 +38,14 @@ public class SearchStructureTypeServiceImpl implements SearchStructureTypeServic
 
         try {
             Long structureTypeId = Long.parseLong(searchField);
-            StructureType structureTypeFindById = structureTypeRepository.findById(structureTypeId).orElseThrow(
-                () -> new GetEntityException(ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND)
-            );
+            StructureType structureTypeFindById = commonRepositoryUtil.getEntityById(
+                structureTypeId,
+                structureTypeRepository,
+                ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND,
+                ExceptionType.GET_ENTITY_EXCEPTION);
             resultSearch.add(structureTypeFindById);
         } catch (NumberFormatException e) {
-            // Игнорируется исключение, так как searchField не является числом (id).
+            // Исключение игнорируется, так как searchField не является ID.
         }
 
         return mapResult(resultSearch);

@@ -1,21 +1,18 @@
 package kg.mega.projectemployeehandbook.controllers;
 
-import kg.mega.projectemployeehandbook.errors.CreateEntityException;
-import kg.mega.projectemployeehandbook.errors.EditEntityException;
-import kg.mega.projectemployeehandbook.models.dto.GetPositionDTO;
 import kg.mega.projectemployeehandbook.models.dto.position.CreatePositionDTO;
 import kg.mega.projectemployeehandbook.models.dto.position.EditPositionDTO;
-import kg.mega.projectemployeehandbook.models.responses.RestResponse;
+import kg.mega.projectemployeehandbook.models.responses.ApiResult;
 import kg.mega.projectemployeehandbook.services.position.CreatePositionService;
 import kg.mega.projectemployeehandbook.services.position.EditPositionService;
 import kg.mega.projectemployeehandbook.services.position.SearchPositionService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-
-import static lombok.AccessLevel.*;
+import static lombok.AccessLevel.PRIVATE;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/api/v1/position")
@@ -27,18 +24,39 @@ public class PositionController {
     final EditPositionService   editPositionService;
 
     @PostMapping("create")
-    public RestResponse<CreateEntityException> create(@RequestBody CreatePositionDTO createPositionDTO) {
-        return createPositionService.createPosition(createPositionDTO);
+    public ResponseEntity<ApiResult> create(@RequestBody CreatePositionDTO createPositionDTO) {
+        return ResponseEntity.ok().body(
+            ApiResult.builder()
+                .httpStatus(OK)
+                .statusCode(OK.value())
+                .response(
+                    createPositionService.createPosition(createPositionDTO)
+                ).build()
+        );
     }
 
     @PatchMapping("edit")
-    public RestResponse<EditEntityException> edit(@RequestBody EditPositionDTO editPositionDTO) {
-        return editPositionService.editPosition(editPositionDTO);
+    public ResponseEntity<ApiResult> edit(@RequestBody EditPositionDTO editPositionDTO) {
+        return ResponseEntity.ok().body(
+            ApiResult.builder()
+                .httpStatus(OK)
+                .statusCode(OK.value())
+                .response(
+                    editPositionService.editPosition(editPositionDTO)
+                ).build()
+        );
     }
 
     @GetMapping("findBy")
-    public Set<GetPositionDTO> search(@RequestParam String searchField) {
-        return searchPositionService.searchPosition(searchField);
+    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
+        return ResponseEntity.ok().body(
+            ApiResult.builder()
+                .httpStatus(OK)
+                .statusCode(OK.value())
+                .response(
+                    searchPositionService.searchPosition(searchField)
+                ).build()
+        );
     }
 
 }

@@ -1,96 +1,126 @@
 package kg.mega.projectemployeehandbook.services.position.impl;
 
-import kg.mega.projectemployeehandbook.errors.EditEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.position.EditPositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
-import kg.mega.projectemployeehandbook.models.responses.RestResponse;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
+import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.position.EditPositionService;
+import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.Objects;
 
 import static java.lang.String.*;
+import static java.util.List.*;
 import static lombok.AccessLevel.*;
-import static org.springframework.http.HttpStatus.*;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditPositionServiceImpl implements EditPositionService {
-    final PositionRepository positionRepository;
-    final LoggingService     loggingService;
+    ErrorCollectorService errorCollectorService;
+    CommonRepositoryUtil  commonRepositoryUtil;
+    PositionRepository    positionRepository;
+    LoggingService        loggingService;
 
     @Override
-    public RestResponse<EditEntityException> editPosition(EditPositionDTO editPositionDTO) {
-        Position position = positionFindById(editPositionDTO.getEditedPositionId());
+    @Transactional
+    public String editPosition(EditPositionDTO editPositionDTO) {
+        errorCollectorService.cleanup();
 
-        updatePositionName(position, editPositionDTO.getNewPositionName());
-        updatePositionMaster(position, editPositionDTO.getNewMasterId());
-        disablePosition(position, editPositionDTO.isDisable());
-        enablePosition(position, editPositionDTO.isEnable());
-
-        positionRepository.save(position);
-
-        loggingService.logInfo(
-            format(InfoDescription.EDIT_POSITION_FORMAT, position.getId())
+        Position position = commonRepositoryUtil.getEntityById(
+            editPositionDTO.getEditedPositionId(),
+            positionRepository,
+            ErrorDescription.POSITION_ID_NOT_FOUND,
+            ExceptionType.EDIT_ENTITY_EXCEPTION
         );
 
-        return new RestResponse<>(OK, null, OK.value(), new ArrayList<>());
-    }
-
-    private Position positionFindById(Long positionId) {
-        Optional<Position> optionalPosition = positionRepository.findById(positionId);
-
-        if (optionalPosition.isEmpty()) {
-            throw new EditEntityException(ErrorDescription.POSITION_ID_NOT_FOUND);
+        if (!validateEditPosition(editPositionDTO, position)) {
+            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
-        return optionalPosition.orElseThrow(EditEntityException::new);
+        String successfulResultMessage = format(InfoDescription.EDIT_POSITION_FORMAT, position.getId());
+        loggingService.logInfo(successfulResultMessage);
+        return successfulResultMessage;
     }
 
-    private void updatePositionName(Position position, String newPositionName) {
-        if (!newPositionName.isEmpty()) {
-            if (position.getPositionName().equals(newPositionName)) {
-                throw new EditEntityException(ErrorDescription.POSITION_NAME_ALREADY_HAVE_THIS_NAME);
-            } else {
-                position.setPositionName(newPositionName);
-            }
+    private boolean validateEditPosition(EditPositionDTO editPositionDTO, Position position) {
+        boolean valid = true;
+        valid &= checkAndSetNewPositionMaster(editPositionDTO.getNewMasterId(), position);
+        valid &= checkAndSetNewPositionName(editPositionDTO.getNewPositionName(), position);
+        valid &= checkAndSetNewPositionActive(editPositionDTO.isDisable(), editPositionDTO.isEnable(), position);
+        return valid;
+    }
+
+    private boolean checkAndSetNewPositionMaster(Long newMasterId, Position position) {
+        if (newMasterId == null) {
+            return true;
         }
-    }
 
-    private void updatePositionMaster(Position position, Long masterId) {
-        if (masterId != null) {
-            Position masterPosition = positionFindById(masterId);
+        Position masterPosition = commonRepositoryUtil.getEntityById(
+            newMasterId,
+            positionRepository,
+            ErrorDescription.POSITION_ID_NOT_FOUND,
+            ExceptionType.EDIT_ENTITY_EXCEPTION
+        );
+
+        if (Objects.equals(position.getMaster(), masterPosition)) {
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.POSITION_ALREADY_THIS_MASTER)
+            );
+            return false;
+        } else {
             position.setMaster(masterPosition);
+            return true;
         }
     }
 
-    private void disablePosition(Position position, boolean disable) {
+    private boolean checkAndSetNewPositionName(String newPositionName, Position position) {
+        if (newPositionName.isBlank()) {
+            return true;
+        }
+
+        if (newPositionName.equals(position.getPositionName())) {
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.POSITION_ALREADY_THIS_NAME)
+            );
+            return false;
+        } else {
+            position.setPositionName(newPositionName);
+            return true;
+        }
+    }
+
+    private boolean checkAndSetNewPositionActive(boolean disable, boolean enable, Position position) {
         if (disable) {
             if (!position.getActive()) {
-                throw new EditEntityException(ErrorDescription.POSITION_ALREADY_INACTIVE);
+                errorCollectorService.addErrorMessages(
+                    of(ErrorDescription.POSITION_ALREADY_INACTIVE)
+                );
+                return false;
             } else {
                 position.setActive(false);
+                return true;
             }
         }
-    }
-
-    private void enablePosition(Position position, boolean enable) {
         if (enable) {
             if (position.getActive()) {
-                throw new EditEntityException(ErrorDescription.POSITION_ALREADY_ACTIVE);
+                errorCollectorService.addErrorMessages(
+                    of(ErrorDescription.POSITION_ALREADY_ACTIVE)
+                );
+                return false;
             } else {
                 position.setActive(true);
+                return true;
             }
         }
+        return true;
     }
-
 }
-

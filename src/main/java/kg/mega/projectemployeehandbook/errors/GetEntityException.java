@@ -1,11 +1,20 @@
 package kg.mega.projectemployeehandbook.errors;
 
+import lombok.experimental.FieldDefaults;
+
+import java.util.Collection;
+
+import static lombok.AccessLevel.*;
+
+@FieldDefaults(level = PRIVATE)
 public class GetEntityException extends RuntimeException {
-    public GetEntityException() {
+    final Collection<String> errorMessages;
+
+    public GetEntityException(final Collection<String> errorMessages) {
+        this.errorMessages = errorMessages;
     }
 
-    public GetEntityException(String message) {
-        super(message);
+    public Collection<String> getErrorMessages() {
+        return errorMessages;
     }
-
 }

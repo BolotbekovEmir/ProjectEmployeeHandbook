@@ -4,7 +4,7 @@ public class PatternConfiguration {
 
     public static final String
 
-        ADMIN_NAME_PATTERN      = "^[A-Za-z\\d]{4,24}$",
+        ADMIN_NAME_PATTERN      = "^[A-Za-z\\d_]{4,24}$",
         EDIT_ADMIN_NAME_PATTERN = "^(|[A-Za-z\\d]{4,24})$",
         EMPLOYEE_NAME_PATTERN   = "^[A-Za-zА-Яа-я]{2,50}$",
         PASSWORD_PATTERN        = "^(?=.*[A-Za-z\\d])(?=.*[^A-Za-z\\d]).{8,32}$",

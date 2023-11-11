@@ -1,12 +1,12 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
-import kg.mega.projectemployeehandbook.errors.CreateEntityException;
+import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.admin.CreateAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
-import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
 import kg.mega.projectemployeehandbook.services.admin.CreateAdminService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
@@ -16,31 +16,30 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-
-import static java.lang.String.*;
-import static kg.mega.projectemployeehandbook.models.enums.AdminRole.*;
-import static lombok.AccessLevel.*;
-import static org.springframework.http.HttpStatus.*;
+import static java.lang.String.format;
+import static java.util.List.of;
+import static kg.mega.projectemployeehandbook.models.enums.AdminRole.ADMIN;
+import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class CreateAdminServiceImpl implements CreateAdminService {
     final ValidationUniqueService validationUniqueService;
+    final ErrorCollectorService   errorCollectorService;
     final AdminRepository         adminRepository;
     final LoggingService          loggingService;
     final MapperConfiguration     mapper;
 
-    final RestResponse<CreateEntityException> response = new RestResponse<>();
-
     @Override
     @Transactional
-    public RestResponse<CreateEntityException> createAdmin(CreateAdminDTO createAdminDTO) {
-        this.response.setErrorDescriptions(new ArrayList<>());
+    public String createAdmin(CreateAdminDTO createAdminDTO) {
+        errorCollectorService.cleanup();
 
-        if (!isValidCreateAdminData(createAdminDTO)) {
-            throw new CreateEntityException(this.response.getErrorDescriptions().toString());
+        isValidCreateAdminData(createAdminDTO);
+
+        if (errorCollectorService.getErrorOccurred()) {
+            errorCollectorService.callException(ExceptionType.CREATE_ENTITY_EXCEPTION);
         }
 
         Admin admin = mapper.getMapper().map(createAdminDTO, Admin.class);
@@ -50,39 +49,26 @@ public class CreateAdminServiceImpl implements CreateAdminService {
 
         adminRepository.save(admin);
 
-        this.response.setHttpResponse(CREATED, CREATED.value());
-
-        loggingService.logInfo(
-            format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName())
-        );
-
-        return this.response;
+        String successResultMessage = format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName());
+        loggingService.logInfo(successResultMessage);
+        return successResultMessage;
     }
 
-    private boolean isValidCreateAdminData(CreateAdminDTO createAdminDTO) {
-        boolean result = true;
-
+    private void isValidCreateAdminData(CreateAdminDTO createAdminDTO) {
         if (!validationUniqueService.isUniqueAdminName(createAdminDTO.getAdminName())) {
-            this.response.addErrorDescription(ErrorDescription.ADMIN_NAME_UNIQUE);
-            result = false;
+            errorCollectorService.addErrorMessages(of(ErrorDescription.ADMIN_NAME_UNIQUE));
         }
 
         if (!createAdminDTO.getPersonalNumber().isBlank()) {
             if (!validationUniqueService.isUniqueAdminPersonalNumber(createAdminDTO.getPersonalNumber())) {
-                this.response.addErrorDescription(ErrorDescription.PERSONAL_NUMBER_UNIQUE);
-                result = false;
+                errorCollectorService.addErrorMessages(of(ErrorDescription.PERSONAL_NUMBER_UNIQUE));
             }
         } else {
-            this.response.addErrorDescription(ErrorDescription.PERSONAL_NUMBER_PATTERN);
-            result = false;
+            errorCollectorService.addErrorMessages(of(ErrorDescription.PERSONAL_NUMBER_PATTERN));
         }
 
         if (!createAdminDTO.getPassword().equals(createAdminDTO.getConfirmPassword())) {
-            this.response.addErrorDescription(ErrorDescription.PASSWORDS_EQUAL);
-            result = false;
+            errorCollectorService.addErrorMessages(of(ErrorDescription.PASSWORDS_EQUAL));
         }
-
-        return result;
     }
-
 }

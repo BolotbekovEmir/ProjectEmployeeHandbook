@@ -1,6 +1,6 @@
 package kg.mega.projectemployeehandbook.services.position;
 
-import kg.mega.projectemployeehandbook.models.dto.GetPositionDTO;
+import kg.mega.projectemployeehandbook.models.dto.position.GetPositionDTO;
 
 import java.util.Set;
 

@@ -1,9 +1,9 @@
 package kg.mega.projectemployeehandbook.services.structure;
 
-import kg.mega.projectemployeehandbook.models.dto.structure.OrganizationStructureDTO;
+import java.util.Set;
 
 public interface SearchStructureService {
 
-    OrganizationStructureDTO searchStructure(Long structureId);
+    Set<String> searchStructure(String searchField);
 
 }

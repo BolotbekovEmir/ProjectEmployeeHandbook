@@ -1,49 +1,54 @@
 package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
-import kg.mega.projectemployeehandbook.errors.CreateEntityException;
+import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.CreateStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
-import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
+import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structuretype.CreateStructureTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
-import static java.lang.String.*;
+import static java.lang.String.format;
+import static java.util.List.*;
 import static lombok.AccessLevel.PRIVATE;
-import static org.springframework.http.HttpStatus.CREATED;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class CreateStructureTypeServiceImpl implements CreateStructureTypeService {
     final StructureTypeRepository structureTypeRepository;
+    final ErrorCollectorService   errorCollectorService;
     final LoggingService          loggingService;
     final MapperConfiguration     mapper;
 
-    final RestResponse<CreateEntityException> response = new RestResponse<>();
-
     @Override
-    public RestResponse<CreateEntityException> createStructureType(CreateStructureTypeDTO createStructureTypeDTO) {
-        this.response.setErrorDescriptions(new ArrayList<>());
+    public String createStructureType(CreateStructureTypeDTO createStructureTypeDTO) {
+        errorCollectorService.cleanup();
+
+        if (!validateStructureTypeName(createStructureTypeDTO.getStructureTypeName())) {
+            errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_NAME_IS_EMPTY));
+            errorCollectorService.callException(ExceptionType.CREATE_ENTITY_EXCEPTION);
+        }
 
         StructureType structureType = mapper.getMapper().map(createStructureTypeDTO, StructureType.class);
 
         structureTypeRepository.save(structureType);
 
-        this.response.setHttpResponse(CREATED, CREATED.value());
-
-        loggingService.logInfo(
-            format(InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, createStructureTypeDTO.getStructureTypeName())
+        String successfulMessage = format(
+            InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, createStructureTypeDTO.getStructureTypeName()
         );
+        loggingService.logInfo(successfulMessage);
+        return successfulMessage;
+    }
 
-        return response;
+    private boolean validateStructureTypeName(String structureTypeName) {
+        return !structureTypeName.isBlank();
     }
 
 }

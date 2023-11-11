@@ -1,95 +1,91 @@
 package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
-import kg.mega.projectemployeehandbook.errors.EditEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.EditStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
-import kg.mega.projectemployeehandbook.models.responses.RestResponse;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
+import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structuretype.EditStructureTypeService;
+import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static java.lang.String.*;
-import static lombok.AccessLevel.*;
-import static org.springframework.http.HttpStatus.*;
+import static java.lang.String.format;
+import static java.util.List.of;
+import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     final StructureTypeRepository structureTypeRepository;
+    final ErrorCollectorService   errorCollectorService;
+    final CommonRepositoryUtil    commonRepositoryUtil;
     final LoggingService          loggingService;
 
-    final RestResponse<EditEntityException> response = new RestResponse<>();
-
     @Override
-    public RestResponse<EditEntityException> editStructureType(EditStructureTypeDTO editStructureTypeDTO) {
-        this.response.setErrorDescriptions(new ArrayList<>());
+    @Transactional
+    public String editStructureType(EditStructureTypeDTO editStructureTypeDTO) {
+        errorCollectorService.cleanup();
 
-        StructureType structureType = getStructureTypeFindById(editStructureTypeDTO.getStructureTypeId());
-
-        updateStructureTypeName(structureType, editStructureTypeDTO.getNewStructureTypeName());
-        disableStructureType(structureType, editStructureTypeDTO.isDisable());
-        enableStructureType(structureType, editStructureTypeDTO.isEnable());
-
-        structureTypeRepository.save(structureType);
-
-        this.response.setHttpResponse(OK, OK.value());
-        loggingService.logInfo(
-            format(InfoDescription.EDIT_STRUCTURE_TYPE_FORMAT, structureType.getId())
+        StructureType structureType = commonRepositoryUtil.getEntityById(
+            editStructureTypeDTO.getStructureTypeId(),
+            structureTypeRepository,
+            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND,
+            ExceptionType.EDIT_ENTITY_EXCEPTION
         );
 
-        return this.response;
-    }
-
-    private void updateStructureTypeName(StructureType structureType, String newStructureTypeName) {
-        if (!newStructureTypeName.isBlank()) {
-            structureType.setStructureTypeName(newStructureTypeName);
+        if (!validateEditStructureType(editStructureTypeDTO, structureType)) {
+            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
+
+        structureTypeRepository.save(structureType);
+        String successfulResultMessage = format(InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, structureType.getStructureTypeName());
+        loggingService.logInfo(successfulResultMessage);
+        return successfulResultMessage;
     }
 
-    private void disableStructureType(StructureType structureType, boolean disable) {
+    private boolean validateEditStructureType(EditStructureTypeDTO editStructureTypeDTO, StructureType structureType) {
+        boolean valid = true;
+        valid &= checkAndSetNewStructureTypeName(editStructureTypeDTO.getNewStructureTypeName(), structureType);
+        valid &= checkAndSetStructureTypeActive(editStructureTypeDTO.isDisable(), editStructureTypeDTO.isEnable(), structureType);
+        return valid;
+    }
+
+    private boolean checkAndSetNewStructureTypeName(String newStructureTypeName, StructureType structureType) {
+        if (newStructureTypeName.isBlank()) {
+            return true;
+        }
+        if (newStructureTypeName.equals(structureType.getStructureTypeName())) {
+            errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_NAME_ALREADY_USED));
+            return false;
+        }
+        structureType.setStructureTypeName(newStructureTypeName);
+        return true;
+    }
+
+    private boolean checkAndSetStructureTypeActive(boolean disable, boolean enable, StructureType structureType) {
         if (disable) {
-            if (structureType.getActive()) {
-                structureType.setActive(false);
-            } else {
-                this.response.addErrorDescription(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE);
-                setErrorResponse();
-            }
-        }
-    }
-
-    private void enableStructureType(StructureType structureType, boolean enable) {
-        if (enable) {
             if (!structureType.getActive()) {
-                structureType.setActive(true);
+                errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE));
+                return false;
             } else {
-                this.response.addErrorDescription(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE);
-                setErrorResponse();
+                structureType.setActive(false);
             }
         }
-    }
-
-    private StructureType getStructureTypeFindById(long structureTypeId) {
-        Optional<StructureType> optionalStructureType = structureTypeRepository.findById(structureTypeId);
-
-        if (optionalStructureType.isEmpty()) {
-            this.response.addErrorDescription(ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND);
-            setErrorResponse();
+        if (enable) {
+            if (structureType.getActive()) {
+                errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE));
+                return false;
+            } else {
+                structureType.setActive(true);
+            }
         }
-
-        return optionalStructureType.orElseThrow(EditEntityException::new);
+        return true;
     }
-
-    private void setErrorResponse() {
-        throw new EditEntityException(this.response.getErrorDescriptions().toString());
-    }
-
 }

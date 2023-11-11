@@ -1,6 +1,6 @@
 package kg.mega.projectemployeehandbook.services.position.impl;
 
-import kg.mega.projectemployeehandbook.models.dto.GetPositionDTO;
+import kg.mega.projectemployeehandbook.models.dto.position.GetPositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
 import kg.mega.projectemployeehandbook.services.position.SearchPositionService;

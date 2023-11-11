@@ -1,16 +1,17 @@
 package kg.mega.projectemployeehandbook.services.structure.impl;
 
-import kg.mega.projectemployeehandbook.errors.GetEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.dto.structure.OrganizationStructureDTO;
 import kg.mega.projectemployeehandbook.models.entities.Structure;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.services.structure.SearchStructureService;
+import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -18,42 +19,47 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class SearchStructureServiceImpl implements SearchStructureService {
-    final StructureRepository structureRepository;
+    final CommonRepositoryUtil commonRepositoryUtil;
+    final StructureRepository  structureRepository;
 
     @Override
-    public OrganizationStructureDTO searchStructure(Long structureId) {
-        Structure structure = findById(structureId);
-        StringBuilder resultBody = new StringBuilder();
+    public Set<String> searchStructure(String searchField) {
+        Set<Structure> structures = structureRepository.findAllByStructureNameContainsIgnoreCaseAndActiveIsTrue(searchField);
 
-        if (structure.getMaster() != null) {
-
-            resultBody.append(structure.getStructureName());
-
-            do {
-                resultBody
-                    .append(" / ")
-                    .append(structure.getMaster().getStructureName());
-
-                structure = structure.getMaster();
-
-            } while (structure.getMaster() != null);
-
-        } else {
-            resultBody.append(structure.getStructureName());
+        try {
+            Long structureId = Long.parseLong(searchField);
+            Structure structure = commonRepositoryUtil.getEntityById(
+                structureId,
+                structureRepository,
+                ErrorDescription.STRUCTURE_ID_NOT_FOUND,
+                ExceptionType.GET_ENTITY_EXCEPTION
+            );
+            structures.add(structure);
+        } catch (NumberFormatException exception) {
+            // Исключение игнорируется, так как searchField не содержит id.
         }
 
-        resultBody.append(" (CEO)");
-
-        return new OrganizationStructureDTO(resultBody.toString());
+        return structureParses(structures);
     }
 
-    private Structure findById(Long structureId) {
-        Optional<Structure> optionalStructure = structureRepository.findById(structureId);
-
-        if (optionalStructure.isEmpty()) {
-            throw new GetEntityException(ErrorDescription.STRUCTURE_ID_NOT_FOUND);
-        }
-
-        return optionalStructure.orElseThrow(GetEntityException::new);
+    private Set<String> structureParses(Set<Structure> structures) {
+        return structures.stream()
+            .map(structure -> {
+                StringBuilder resultParse = new StringBuilder();
+                if (structure.getMaster() != null) {
+                    resultParse.append(structure.getStructureName());
+                    do {
+                        resultParse
+                            .append(" / ")
+                            .append(structure.getMaster().getStructureName());
+                        structure = structure.getMaster();
+                    } while (structure.getMaster() != null);
+                } else {
+                    resultParse.append(structure.getStructureName());
+                }
+                resultParse.append(" (CEO)");
+                return resultParse.toString();
+            })
+            .collect(Collectors.toSet());
     }
 }
