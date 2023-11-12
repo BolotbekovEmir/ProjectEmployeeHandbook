@@ -15,9 +15,9 @@ import static lombok.AccessLevel.*;
 
 @Component
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CommonRepositoryUtil {
-    final ErrorCollectorService errorCollectorService;
+    ErrorCollectorService errorCollectorService;
 
     public <E> E getEntityById(
         Long entityId,
@@ -29,7 +29,9 @@ public class CommonRepositoryUtil {
             Optional<E> optionalEntity = repository.findById(entityId);
 
             if (optionalEntity.isEmpty()) {
-                errorCollectorService.addErrorMessages(of(errorMessage));
+                errorCollectorService.addErrorMessages(
+                    of(errorMessage)
+                );
                 errorCollectorService.callException(exceptionType);
             }
 

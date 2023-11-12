@@ -13,7 +13,10 @@ import static lombok.AccessLevel.*;
 @FieldDefaults(level = PRIVATE)
 public class ChangeAdminPasswordDTO {
 
-    @Pattern(regexp = PASSWORD_PATTERN, message = ErrorDescription.PASSWORD_PATTERN)
+    @Pattern(
+        regexp = PASSWORD_PATTERN,
+        message = ErrorDescription.PASSWORD_PATTERN
+    )
     String newAdminPassword;
 
     String confirmNewAdminPassword;

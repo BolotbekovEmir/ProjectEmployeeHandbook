@@ -2,6 +2,7 @@ package kg.mega.projectemployeehandbook.errors.handlers;
 
 import kg.mega.projectemployeehandbook.errors.GetEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.models.responses.ApiResult;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ControllerAdvice
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class GetEntityExceptionHandler {
-    final LoggingService loggingService;
+    LoggingService loggingService;
 
     @ExceptionHandler(GetEntityException.class)
     @ResponseStatus(BAD_REQUEST)
@@ -37,8 +38,9 @@ public class GetEntityExceptionHandler {
             ApiResult.builder()
                 .httpStatus(BAD_REQUEST)
                 .statusCode(BAD_REQUEST.value())
-                .response("GetEntityException")
-                .errors(of(errorName))
+                .response(
+                    ExceptionType.GET_ENTITY_EXCEPTION.getStringName()
+                ).errors(of(errorName))
                 .descriptions(descriptions)
                 .build()
         );

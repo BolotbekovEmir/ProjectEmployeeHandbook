@@ -13,12 +13,18 @@ import static lombok.AccessLevel.*;
 @FieldDefaults(level = PRIVATE)
 public class CreateAdminDTO {
 
-    @Pattern(regexp = ADMIN_NAME_PATTERN, message = ErrorDescription.ADMIN_NAME_PATTERN)
+    @Pattern(
+        regexp = ADMIN_NAME_PATTERN,
+        message = ErrorDescription.ADMIN_NAME_PATTERN
+    )
     String adminName;
 
     String personalNumber;
 
-    @Pattern(regexp = PASSWORD_PATTERN, message = ErrorDescription.PASSWORD_PATTERN)
+    @Pattern(
+        regexp = PASSWORD_PATTERN,
+        message = ErrorDescription.PASSWORD_PATTERN
+    )
     String password;
 
     String confirmPassword;

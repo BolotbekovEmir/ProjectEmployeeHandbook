@@ -6,9 +6,9 @@ import java.util.Collection;
 
 import static lombok.AccessLevel.*;
 
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class GetEntityException extends RuntimeException {
-    final Collection<String> errorMessages;
+    Collection<String> errorMessages;
 
     public GetEntityException(final Collection<String> errorMessages) {
         this.errorMessages = errorMessages;

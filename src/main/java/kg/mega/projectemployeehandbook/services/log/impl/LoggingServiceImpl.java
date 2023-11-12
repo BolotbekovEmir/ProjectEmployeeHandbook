@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class LoggingServiceImpl implements LoggingService {
-
     @Override
     public void logInfo(String message) {
         log.info(message);
@@ -17,5 +16,4 @@ public class LoggingServiceImpl implements LoggingService {
     public void logError(String message) {
         log.error(message);
     }
-
 }

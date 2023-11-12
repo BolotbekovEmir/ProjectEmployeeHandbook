@@ -20,11 +20,11 @@ import static lombok.AccessLevel.*;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SearchStructureTypeServiceImpl implements SearchStructureTypeService {
-    final StructureTypeRepository structureTypeRepository;
-    final CommonRepositoryUtil    commonRepositoryUtil;
-    final MapperConfiguration     mapper;
+    StructureTypeRepository structureTypeRepository;
+    CommonRepositoryUtil    commonRepositoryUtil;
+    MapperConfiguration     mapper;
 
     @Override
     public Set<GetStructureTypeDTO> searchStructureType(String searchField) {

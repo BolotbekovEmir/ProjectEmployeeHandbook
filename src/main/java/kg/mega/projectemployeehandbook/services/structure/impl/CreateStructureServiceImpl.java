@@ -21,13 +21,13 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateStructureServiceImpl implements CreateStructureService {
-    final StructureTypeRepository structureTypeRepository;
-    final ErrorCollectorService   errorCollectorService;
-    final CommonRepositoryUtil    commonRepositoryUtil;
-    final StructureRepository     structureRepository;
-    final LoggingService          loggingService;
+    StructureTypeRepository structureTypeRepository;
+    ErrorCollectorService   errorCollectorService;
+    CommonRepositoryUtil    commonRepositoryUtil;
+    StructureRepository     structureRepository;
+    LoggingService          loggingService;
 
     @Override
     public String createStructure(CreateStructureDTO createStructureDTO) {
@@ -56,8 +56,8 @@ public class CreateStructureServiceImpl implements CreateStructureService {
 
         structureRepository.save(structure);
 
-        String successfulResultMessage = format(InfoDescription.CRETE_STRUCTURE_FORMAT, structure.getId());
-        loggingService.logInfo(successfulResultMessage);
-        return successfulResultMessage;
+        String operationSuccessMessage = format(InfoDescription.CRETE_STRUCTURE_FORMAT, structure.getId());
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 }

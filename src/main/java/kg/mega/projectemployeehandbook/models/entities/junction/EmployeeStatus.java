@@ -1,7 +1,7 @@
 package kg.mega.projectemployeehandbook.models.entities.junction;
 
 import kg.mega.projectemployeehandbook.models.entities.Employee;
-import kg.mega.projectemployeehandbook.models.entities.Status;
+import kg.mega.projectemployeehandbook.models.enums.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -27,8 +27,8 @@ public class EmployeeStatus {
     @JoinColumn(referencedColumnName = "id")
     Employee employee;
 
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id")
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     Status status;
 
     @Column(nullable = false)

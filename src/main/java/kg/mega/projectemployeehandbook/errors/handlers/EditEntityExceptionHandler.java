@@ -21,9 +21,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ControllerAdvice
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditEntityExceptionHandler {
-    final LoggingService loggingService;
+    LoggingService loggingService;
 
     @ExceptionHandler(EditEntityException.class)
     @ResponseStatus(BAD_REQUEST)
@@ -38,8 +38,9 @@ public class EditEntityExceptionHandler {
             ApiResult.builder()
                 .httpStatus(BAD_REQUEST)
                 .statusCode(BAD_REQUEST.value())
-                .response(ExceptionType.EDIT_ENTITY_EXCEPTION.getStringName())
-                .errors(of(errorName))
+                .response(
+                    ExceptionType.EDIT_ENTITY_EXCEPTION.getStringName()
+                ).errors(of(errorName))
                 .descriptions(descriptions)
                 .build()
         );

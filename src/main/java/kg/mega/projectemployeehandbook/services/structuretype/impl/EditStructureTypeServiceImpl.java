@@ -21,12 +21,12 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditStructureTypeServiceImpl implements EditStructureTypeService {
-    final StructureTypeRepository structureTypeRepository;
-    final ErrorCollectorService   errorCollectorService;
-    final CommonRepositoryUtil    commonRepositoryUtil;
-    final LoggingService          loggingService;
+    StructureTypeRepository structureTypeRepository;
+    ErrorCollectorService   errorCollectorService;
+    CommonRepositoryUtil    commonRepositoryUtil;
+    LoggingService          loggingService;
 
     @Override
     @Transactional
@@ -45,9 +45,10 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         }
 
         structureTypeRepository.save(structureType);
-        String successfulResultMessage = format(InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, structureType.getStructureTypeName());
-        loggingService.logInfo(successfulResultMessage);
-        return successfulResultMessage;
+
+        String operationSuccessMessage = format(InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, structureType.getStructureTypeName());
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 
     private boolean validateEditStructureType(EditStructureTypeDTO editStructureTypeDTO, StructureType structureType) {
@@ -62,7 +63,9 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
             return true;
         }
         if (newStructureTypeName.equals(structureType.getStructureTypeName())) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_NAME_ALREADY_USED));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.STRUCTURE_TYPE_NAME_ALREADY_USED)
+            );
             return false;
         }
         structureType.setStructureTypeName(newStructureTypeName);
@@ -72,7 +75,9 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     private boolean checkAndSetStructureTypeActive(boolean disable, boolean enable, StructureType structureType) {
         if (disable) {
             if (!structureType.getActive()) {
-                errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE));
+                errorCollectorService.addErrorMessages(
+                    of(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE)
+                );
                 return false;
             } else {
                 structureType.setActive(false);
@@ -80,7 +85,9 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         }
         if (enable) {
             if (structureType.getActive()) {
-                errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE));
+                errorCollectorService.addErrorMessages(
+                    of(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE)
+                );
                 return false;
             } else {
                 structureType.setActive(true);

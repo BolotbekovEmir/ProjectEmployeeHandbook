@@ -15,9 +15,9 @@ import static lombok.AccessLevel.*;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SearchPositionServiceImpl implements SearchPositionService {
-    final PositionRepository positionRepository;
+    PositionRepository positionRepository;
 
     @Override
     public Set<GetPositionDTO> searchPosition(String searchField) {

@@ -10,9 +10,9 @@ import static lombok.AccessLevel.*;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ValidationUniqueServiceImpl implements ValidationUniqueService {
-    final AdminRepository adminRepository;
+    AdminRepository adminRepository;
 
     @Override
     public boolean isUniqueAdminName(String adminName) {

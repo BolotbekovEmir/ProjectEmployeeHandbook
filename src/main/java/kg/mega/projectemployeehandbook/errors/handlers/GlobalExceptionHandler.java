@@ -21,9 +21,9 @@ import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class GlobalExceptionHandler {
-    final LoggingService loggingService;
+    LoggingService loggingService;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
@@ -49,8 +49,9 @@ public class GlobalExceptionHandler {
             ApiResult.builder()
                 .httpStatus(BAD_REQUEST)
                 .statusCode(BAD_REQUEST.value())
-                .response("MethodArgumentNotValidException")
-                .errors(fields)
+                .response(
+                    "MethodArgumentNotValidException"
+                ).errors(fields)
                 .descriptions(messages)
                 .build()
         );

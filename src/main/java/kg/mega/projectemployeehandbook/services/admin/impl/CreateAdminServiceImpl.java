@@ -23,13 +23,13 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateAdminServiceImpl implements CreateAdminService {
-    final ValidationUniqueService validationUniqueService;
-    final ErrorCollectorService   errorCollectorService;
-    final AdminRepository         adminRepository;
-    final LoggingService          loggingService;
-    final MapperConfiguration     mapper;
+    ValidationUniqueService validationUniqueService;
+    ErrorCollectorService   errorCollectorService;
+    AdminRepository         adminRepository;
+    LoggingService          loggingService;
+    MapperConfiguration     mapper;
 
     @Override
     @Transactional
@@ -44,31 +44,39 @@ public class CreateAdminServiceImpl implements CreateAdminService {
 
         Admin admin = mapper.getMapper().map(createAdminDTO, Admin.class);
 
-        // TODO: 07.11.2023 encoder
+        // TODO: 07.11.2023 Encoder
         admin.setAdminRole(ADMIN);
 
         adminRepository.save(admin);
 
-        String successResultMessage = format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName());
-        loggingService.logInfo(successResultMessage);
-        return successResultMessage;
+        String operationSuccessMessage = format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName());
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 
     private void isValidCreateAdminData(CreateAdminDTO createAdminDTO) {
         if (!validationUniqueService.isUniqueAdminName(createAdminDTO.getAdminName())) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.ADMIN_NAME_UNIQUE));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.ADMIN_NAME_UNIQUE)
+            );
         }
 
         if (!createAdminDTO.getPersonalNumber().isBlank()) {
             if (!validationUniqueService.isUniqueAdminPersonalNumber(createAdminDTO.getPersonalNumber())) {
-                errorCollectorService.addErrorMessages(of(ErrorDescription.PERSONAL_NUMBER_UNIQUE));
+                errorCollectorService.addErrorMessages(
+                    of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
+                );
             }
         } else {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.PERSONAL_NUMBER_PATTERN));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.PERSONAL_NUMBER_PATTERN)
+            );
         }
 
         if (!createAdminDTO.getPassword().equals(createAdminDTO.getConfirmPassword())) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.PASSWORDS_EQUAL));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.PASSWORDS_EQUAL)
+            );
         }
     }
 }

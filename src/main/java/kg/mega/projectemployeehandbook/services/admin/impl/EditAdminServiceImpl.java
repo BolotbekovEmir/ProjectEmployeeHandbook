@@ -27,12 +27,12 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditAdminServiceImpl implements EditAdminService {
-    final ValidationUniqueService validationUniqueService;
-    final ErrorCollectorService errorCollectorService;
-    final AdminRepository adminRepository;
-    final LoggingService loggingService;
+    ValidationUniqueService validationUniqueService;
+    ErrorCollectorService   errorCollectorService;
+    AdminRepository         adminRepository;
+    LoggingService          loggingService;
 
     @Override
     @Transactional
@@ -47,15 +47,18 @@ public class EditAdminServiceImpl implements EditAdminService {
         }
 
         adminRepository.save(Objects.requireNonNull(admin));
-        String successResultMessage = format(InfoDescription.EDIT_ADMIN_FORMAT, searchedAdminName);
-        loggingService.logInfo(successResultMessage);
-        return successResultMessage;
+
+        String operationSuccessMessage = format(InfoDescription.EDIT_ADMIN_FORMAT, searchedAdminName);
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 
     private Admin getAdminFindByName(String adminName) {
         Optional<Admin> optionalAdmin = adminRepository.findByAdminName(adminName);
         if (optionalAdmin.isEmpty()) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.ADMIN_NOT_FOUND));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.ADMIN_NAME_NOT_FOUND)
+            );
         }
         return optionalAdmin.orElseThrow();
     }
@@ -74,11 +77,15 @@ public class EditAdminServiceImpl implements EditAdminService {
             return true;
         }
         if (admin.getAdminName().equals(newAdminName)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.THIS_ADMIN_NAME_ALREADY_USED));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.THIS_ADMIN_NAME_ALREADY_USED)
+            );
             return false;
         }
         if (!validationUniqueService.isUniqueAdminName(newAdminName)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.ADMIN_NAME_UNIQUE));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.ADMIN_NAME_UNIQUE)
+            );
             return false;
         }
         admin.setAdminName(newAdminName);
@@ -90,11 +97,15 @@ public class EditAdminServiceImpl implements EditAdminService {
             return true;
         }
         if (admin.getPersonalNumber().equals(newPersonalNumber)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.THIS_ADMIN_PERSONAL_NUMBER_ALREADY_USED));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.THIS_ADMIN_PERSONAL_NUMBER_ALREADY_USED)
+            );
             return false;
         }
         if (!validationUniqueService.isUniqueAdminPersonalNumber(newPersonalNumber)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.PERSONAL_NUMBER_UNIQUE));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
+            );
             return false;
         }
         admin.setPersonalNumber(newPersonalNumber);
@@ -106,27 +117,35 @@ public class EditAdminServiceImpl implements EditAdminService {
             return true;
         }
         if (admin.getPassword().equals(newPassword)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.THIS_PASSWORD_ALREADY_USED));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.THIS_PASSWORD_ALREADY_USED)
+            );
             return false;
         }
         if (!newPassword.equals(confirmNewPassword)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.PASSWORDS_EQUAL));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.PASSWORDS_EQUAL)
+            );
             return false;
         }
-        // TODO: 11.11.2023 encoder
+        // TODO: 11.11.2023 Encoder
         admin.setPassword(newPassword);
         return true;
     }
 
     private boolean checkAndSetAdminRole(boolean disableAdmin, boolean enableAdmin, AdminRole currentRole, Admin admin) {
         if (disableAdmin && currentRole.equals(DISABLE)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.ADMIN_DISABLE));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.ADMIN_DISABLE)
+            );
             return false;
         } else if (disableAdmin) {
             admin.setAdminRole(DISABLE);
         }
         if (enableAdmin && currentRole.equals(ADMIN)) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.ADMIN_ENABLE));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.ADMIN_ENABLE)
+            );
             return false;
         } else if (enableAdmin) {
             admin.setAdminRole(ADMIN);

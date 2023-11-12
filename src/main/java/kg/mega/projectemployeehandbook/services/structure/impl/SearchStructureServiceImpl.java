@@ -17,10 +17,10 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SearchStructureServiceImpl implements SearchStructureService {
-    final CommonRepositoryUtil commonRepositoryUtil;
-    final StructureRepository  structureRepository;
+    CommonRepositoryUtil commonRepositoryUtil;
+    StructureRepository  structureRepository;
 
     @Override
     public Set<String> searchStructure(String searchField) {

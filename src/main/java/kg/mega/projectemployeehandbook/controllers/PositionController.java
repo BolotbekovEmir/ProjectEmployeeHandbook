@@ -17,11 +17,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/v1/position")
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class PositionController {
-    final CreatePositionService createPositionService;
-    final SearchPositionService searchPositionService;
-    final EditPositionService   editPositionService;
+    CreatePositionService createPositionService;
+    SearchPositionService searchPositionService;
+    EditPositionService   editPositionService;
 
     @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreatePositionDTO createPositionDTO) {

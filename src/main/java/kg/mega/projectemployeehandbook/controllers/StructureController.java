@@ -18,11 +18,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/v1/structure")
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class StructureController {
-    final CreateStructureService createStructureService;
-    final SearchStructureService searchStructureService;
-    final EditStructureService   editStructureService;
+    CreateStructureService createStructureService;
+    SearchStructureService searchStructureService;
+    EditStructureService   editStructureService;
 
     @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureDTO createStructureDTO) {

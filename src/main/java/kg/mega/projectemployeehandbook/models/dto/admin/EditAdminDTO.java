@@ -13,15 +13,24 @@ import static lombok.AccessLevel.*;
 @FieldDefaults(level = PRIVATE)
 public class EditAdminDTO {
 
-    @Pattern(regexp = EDIT_ADMIN_NAME_PATTERN, message = ErrorDescription.ADMIN_NAME_PATTERN)
+    @Pattern(
+        regexp = EDIT_ADMIN_NAME_PATTERN,
+        message = ErrorDescription.ADMIN_NAME_PATTERN
+    )
     String searchedAdminName;
 
-    @Pattern(regexp = EDIT_ADMIN_NAME_PATTERN, message = ErrorDescription.ADMIN_NAME_PATTERN)
+    @Pattern(
+        regexp = EDIT_ADMIN_NAME_PATTERN,
+        message = ErrorDescription.ADMIN_NAME_PATTERN
+    )
     String newAdminName;
 
     String newPersonalNumber;
 
-    @Pattern(regexp = EDIT_PASSWORD_PATTERN, message = ErrorDescription.PASSWORD_PATTERN)
+    @Pattern(
+        regexp = EDIT_PASSWORD_PATTERN,
+        message = ErrorDescription.PASSWORD_PATTERN
+    )
     String newPassword;
 
     String confirmNewPassword;

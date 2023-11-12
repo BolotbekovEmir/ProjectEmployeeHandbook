@@ -25,13 +25,13 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditStructureServiceImpl implements EditStructureService {
-    final StructureTypeRepository structureTypeRepository;
-    final ErrorCollectorService   errorCollectorService;
-    final CommonRepositoryUtil    commonRepositoryUtil;
-    final StructureRepository     structureRepository;
-    final LoggingService          loggingService;
+    StructureTypeRepository structureTypeRepository;
+    ErrorCollectorService   errorCollectorService;
+    CommonRepositoryUtil    commonRepositoryUtil;
+    StructureRepository     structureRepository;
+    LoggingService          loggingService;
 
     @Override
     @Transactional
@@ -49,9 +49,11 @@ public class EditStructureServiceImpl implements EditStructureService {
             errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
-        String successfulResultMessage = format(InfoDescription.EDIT_STRUCTURE_FORMAT, 0);
-        loggingService.logInfo(successfulResultMessage);
-        return successfulResultMessage;
+        structureRepository.save(structure);
+
+        String operationSuccessMessage = format(InfoDescription.EDIT_STRUCTURE_FORMAT, 0);
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 
     private boolean validateEditStructure(EditStructureDTO editStructureDTO, Structure structure) {

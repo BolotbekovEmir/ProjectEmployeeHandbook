@@ -17,13 +17,13 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class AdminController {
-    final ChangeAdminPasswordService changeAdminPasswordService;
-    final CreateAdminService         createAdminService;
-    final SearchAdminService         searchAdminService;
-    final AuthAdminService           authAdminService;
-    final EditAdminService           editAdminService;
+    ChangeAdminPasswordService changeAdminPasswordService;
+    CreateAdminService         createAdminService;
+    SearchAdminService         searchAdminService;
+    AuthAdminService           authAdminService;
+    EditAdminService           editAdminService;
 
     @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {

@@ -46,9 +46,11 @@ public class EditPositionServiceImpl implements EditPositionService {
             errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
-        String successfulResultMessage = format(InfoDescription.EDIT_POSITION_FORMAT, position.getId());
-        loggingService.logInfo(successfulResultMessage);
-        return successfulResultMessage;
+        positionRepository.save(position);
+
+        String operationSuccessMessage = format(InfoDescription.EDIT_POSITION_FORMAT, position.getId());
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 
     private boolean validateEditPosition(EditPositionDTO editPositionDTO, Position position) {

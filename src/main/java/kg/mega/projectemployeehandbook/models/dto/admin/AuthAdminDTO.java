@@ -13,10 +13,16 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE)
 public class AuthAdminDTO {
 
-    @Pattern(regexp = PatternConfiguration.ADMIN_NAME_PATTERN, message = ErrorDescription.ADMIN_AUTH_INVALID)
+    @Pattern(
+        regexp = PatternConfiguration.ADMIN_NAME_PATTERN,
+        message = ErrorDescription.ADMIN_AUTH_INVALID
+    )
     String adminName;
 
-    @Pattern(regexp = PatternConfiguration.PASSWORD_PATTERN, message = ErrorDescription.ADMIN_AUTH_INVALID)
+    @Pattern(
+        regexp = PatternConfiguration.PASSWORD_PATTERN,
+        message = ErrorDescription.ADMIN_AUTH_INVALID
+    )
     String password;
 
 }

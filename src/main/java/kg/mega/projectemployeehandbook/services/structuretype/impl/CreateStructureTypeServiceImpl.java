@@ -20,19 +20,21 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateStructureTypeServiceImpl implements CreateStructureTypeService {
-    final StructureTypeRepository structureTypeRepository;
-    final ErrorCollectorService   errorCollectorService;
-    final LoggingService          loggingService;
-    final MapperConfiguration     mapper;
+    StructureTypeRepository structureTypeRepository;
+    ErrorCollectorService   errorCollectorService;
+    LoggingService          loggingService;
+    MapperConfiguration     mapper;
 
     @Override
     public String createStructureType(CreateStructureTypeDTO createStructureTypeDTO) {
         errorCollectorService.cleanup();
 
         if (!validateStructureTypeName(createStructureTypeDTO.getStructureTypeName())) {
-            errorCollectorService.addErrorMessages(of(ErrorDescription.STRUCTURE_TYPE_NAME_IS_EMPTY));
+            errorCollectorService.addErrorMessages(
+                of(ErrorDescription.STRUCTURE_TYPE_NAME_IS_EMPTY)
+            );
             errorCollectorService.callException(ExceptionType.CREATE_ENTITY_EXCEPTION);
         }
 
@@ -40,11 +42,11 @@ public class CreateStructureTypeServiceImpl implements CreateStructureTypeServic
 
         structureTypeRepository.save(structureType);
 
-        String successfulMessage = format(
+        String operationSuccessMessage = format(
             InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, createStructureTypeDTO.getStructureTypeName()
         );
-        loggingService.logInfo(successfulMessage);
-        return successfulMessage;
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 
     private boolean validateStructureTypeName(String structureTypeName) {

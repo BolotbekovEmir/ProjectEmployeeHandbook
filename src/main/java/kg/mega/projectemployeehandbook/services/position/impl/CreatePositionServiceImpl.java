@@ -19,12 +19,12 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreatePositionServiceImpl implements CreatePositionService {
-    final ErrorCollectorService errorCollectorService;
-    final CommonRepositoryUtil  commonRepositoryUtil;
-    final PositionRepository    positionRepository;
-    final LoggingService        loggingService;
+    ErrorCollectorService errorCollectorService;
+    CommonRepositoryUtil  commonRepositoryUtil;
+    PositionRepository    positionRepository;
+    LoggingService        loggingService;
 
     @Override
     public String createPosition(CreatePositionDTO createPositionDTO) {
@@ -45,8 +45,8 @@ public class CreatePositionServiceImpl implements CreatePositionService {
 
         positionRepository.save(position);
 
-        String successfulResultMessage = format(InfoDescription.CREATE_POSITION_FORMAT, position.getId());
-        loggingService.logInfo(successfulResultMessage);
-        return successfulResultMessage;
+        String operationSuccessMessage = format(InfoDescription.CREATE_POSITION_FORMAT, position.getId());
+        loggingService.logInfo(operationSuccessMessage);
+        return operationSuccessMessage;
     }
 }

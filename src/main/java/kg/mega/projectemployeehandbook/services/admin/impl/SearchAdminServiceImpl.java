@@ -19,10 +19,10 @@ import static lombok.AccessLevel.*;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SearchAdminServiceImpl implements SearchAdminService {
-    final AdminRepository     adminRepository;
-    final MapperConfiguration mapper;
+    AdminRepository     adminRepository;
+    MapperConfiguration mapper;
 
     @Override
     public Set<GetAdminDTO> searchAdmins(String searchField) {
