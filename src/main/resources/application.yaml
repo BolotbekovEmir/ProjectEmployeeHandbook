@@ -1,0 +1,14 @@
+jwt.lifetime: 10m
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_project_handbook
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
