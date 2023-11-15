@@ -1,8 +1,8 @@
 package kg.mega.projectemployeehandbook.services;
 
-import kg.mega.projectemployeehandbook.errors.CreateEntityException;
-import kg.mega.projectemployeehandbook.errors.EditEntityException;
-import kg.mega.projectemployeehandbook.errors.GetEntityException;
+import kg.mega.projectemployeehandbook.errors.exceptions.CreateEntityException;
+import kg.mega.projectemployeehandbook.errors.exceptions.EditEntityException;
+import kg.mega.projectemployeehandbook.errors.exceptions.GetEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;

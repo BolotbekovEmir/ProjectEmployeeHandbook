@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.errors;
+package kg.mega.projectemployeehandbook.errors.exceptions;
 
 import lombok.experimental.FieldDefaults;
 

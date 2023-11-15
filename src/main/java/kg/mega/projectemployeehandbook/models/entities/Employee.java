@@ -15,6 +15,7 @@ import static lombok.AccessLevel.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @FieldDefaults(level = PRIVATE)
 public class Employee {
 
@@ -30,7 +31,7 @@ public class Employee {
     @Column(nullable = false)
     String lastname;
 
-    String fathersName;
+    String patronimyc;
 
     @Column(nullable = false)
     String phone;
@@ -44,6 +45,7 @@ public class Employee {
     String pathPhoto;
 
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     FamilyStatus familyStatus;
 
     @Column(nullable = false)

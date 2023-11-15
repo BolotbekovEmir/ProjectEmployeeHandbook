@@ -6,4 +6,10 @@ public interface ValidationUniqueService {
 
     boolean isUniqueAdminPersonalNumber(String personalNumber);
 
+    boolean isUniqueEmployeePersonalNumber(String personalNumber);
+
+    boolean isUniquePhone(String phone);
+
+    boolean isUniqueEmail(String email);
+
 }

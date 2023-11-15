@@ -28,7 +28,7 @@ public class EditAdminDTO {
     String newPersonalNumber;
 
     @Pattern(
-        regexp = EDIT_PASSWORD_PATTERN,
+        regexp = PASSWORD_OPTIONAL_PATTERN,
         message = ErrorDescription.PASSWORD_PATTERN
     )
     String newPassword;

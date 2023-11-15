@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.errors;
+package kg.mega.projectemployeehandbook.errors.exceptions;
 
 import lombok.experimental.FieldDefaults;
 
@@ -17,4 +17,5 @@ public class CreateEntityException extends RuntimeException {
     public Collection<String> getErrorDescriptions() {
         return errorDescriptions;
     }
+
 }

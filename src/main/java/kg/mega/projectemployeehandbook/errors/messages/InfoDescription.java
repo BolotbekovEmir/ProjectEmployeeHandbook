@@ -11,16 +11,20 @@ public class InfoDescription {
 
         /* Сообщения тип структур */
 
-        CREATE_STRUCTURE_TYPE_FORMAT = "Создан тип структуры с именем '%s'",
-        EDIT_STRUCTURE_TYPE_FORMAT = "Изменен тип структуры с номером '%d'",
+        CREATE_STRUCTURE_TYPE_FORMAT = "Создан тип структуры с ID '%s'",
+        EDIT_STRUCTURE_TYPE_FORMAT = "Изменен тип структуры с ID '%d'",
 
         /* Сообщения структур */
-        CRETE_STRUCTURE_FORMAT = "Создана структура с номером '%d'",
-        EDIT_STRUCTURE_FORMAT = "Изменена структура с номером '%d'",
+        CRETE_STRUCTURE_FORMAT = "Создана структура с ID '%d'",
+        EDIT_STRUCTURE_FORMAT = "Изменена структура с ID '%d'",
 
         /* Сообщения позиций */
 
-        CREATE_POSITION_FORMAT = "Создана позиция с номером '%d'",
-        EDIT_POSITION_FORMAT = "Изменена позиция с номером '%d'";
+        CREATE_POSITION_FORMAT = "Создана позиция с ID '%d'",
+        EDIT_POSITION_FORMAT = "Изменена позиция с ID '%d'",
+
+        /* Сообщения для сотрудников */
+
+        CREATE_EMPLOYEE_FORMAT = "Создан сотрудник с ID '%d'";
 
 }

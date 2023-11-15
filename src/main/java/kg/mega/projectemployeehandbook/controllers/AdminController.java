@@ -15,7 +15,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api/v1/admin")
+@RequestMapping("/api/v1/admins")
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class AdminController {
@@ -25,7 +25,8 @@ public class AdminController {
     AuthAdminService           authAdminService;
     EditAdminService           editAdminService;
 
-    @PostMapping("create")
+    /* Создание администратора */
+    @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -37,7 +38,8 @@ public class AdminController {
         );
     }
 
-    @PatchMapping("edit")
+    /* Изменение администратора системным администратором */
+    @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody @Valid EditAdminDTO editAdminDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -49,8 +51,9 @@ public class AdminController {
         );
     }
 
-    @GetMapping("findBy")
-    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
+    /* Поиск администратора */
+    @GetMapping("{searchField}")
+    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)
@@ -61,6 +64,7 @@ public class AdminController {
         );
     }
 
+    /* Изменение пароля администратора самим администратором */
     @PatchMapping("changePassword")
     public ResponseEntity<ApiResult> changePassword(@RequestBody @Valid ChangeAdminPasswordDTO changeAdminPasswordDTO) {
         return ResponseEntity.ok().body(
@@ -73,7 +77,8 @@ public class AdminController {
         );
     }
 
-    @GetMapping("auth")
+    /* Аутентификация администратора */
+    @PostMapping("auth")
     public ResponseEntity<ApiResult> adminAuth(@RequestBody @Valid AuthAdminDTO authAdminDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()

@@ -15,7 +15,7 @@ import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api/v1/position")
+@RequestMapping("/api/v1/positions")
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class PositionController {
@@ -23,7 +23,8 @@ public class PositionController {
     SearchPositionService searchPositionService;
     EditPositionService   editPositionService;
 
-    @PostMapping("create")
+    /* Создание позиции */
+    @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody CreatePositionDTO createPositionDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -35,7 +36,8 @@ public class PositionController {
         );
     }
 
-    @PatchMapping("edit")
+    /* Изменение позиции */
+    @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody EditPositionDTO editPositionDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -47,8 +49,9 @@ public class PositionController {
         );
     }
 
-    @GetMapping("findBy")
-    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
+    /* Поиск позиции */
+    @GetMapping("{searchField}")
+    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)

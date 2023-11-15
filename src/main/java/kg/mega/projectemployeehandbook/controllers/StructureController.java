@@ -16,7 +16,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api/v1/structure")
+@RequestMapping("/api/v1/structures")
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class StructureController {
@@ -24,7 +24,8 @@ public class StructureController {
     SearchStructureService searchStructureService;
     EditStructureService   editStructureService;
 
-    @PostMapping("create")
+    /* Создание структуры */
+    @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureDTO createStructureDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -36,7 +37,8 @@ public class StructureController {
         );
     }
 
-    @PatchMapping("edit")
+    /* Изменение структуры */
+    @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody EditStructureDTO editStructureDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -48,8 +50,9 @@ public class StructureController {
         );
     }
 
-    @GetMapping("search")
-    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
+    /* Получение структуры */
+    @GetMapping("{searchField}")
+    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)

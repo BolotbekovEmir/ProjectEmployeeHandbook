@@ -1,6 +1,6 @@
 package kg.mega.projectemployeehandbook.errors.handlers;
 
-import kg.mega.projectemployeehandbook.errors.GetEntityException;
+import kg.mega.projectemployeehandbook.errors.exceptions.GetEntityException;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.models.responses.ApiResult;

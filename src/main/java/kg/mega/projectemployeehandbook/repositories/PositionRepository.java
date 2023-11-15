@@ -8,8 +8,6 @@ import java.util.Set;
 
 public interface PositionRepository extends JpaRepository<Position, Long> {
 
-    Optional<Position> findByPositionName(String positionName);
-
     Set<Position> findAllByPositionNameContainsIgnoreCaseAndActiveIsTrue(String positionName);
 
 }
