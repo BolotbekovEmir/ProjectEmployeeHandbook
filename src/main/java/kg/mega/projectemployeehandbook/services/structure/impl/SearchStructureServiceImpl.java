@@ -31,8 +31,7 @@ public class SearchStructureServiceImpl implements SearchStructureService {
             Structure structure = commonRepositoryUtil.getEntityById(
                 structureId,
                 structureRepository,
-                ErrorDescription.STRUCTURE_ID_NOT_FOUND,
-                ExceptionType.GET_ENTITY_EXCEPTION
+                ErrorDescription.STRUCTURE_ID_NOT_FOUND
             );
             structures.add(structure);
         } catch (NumberFormatException exception) {

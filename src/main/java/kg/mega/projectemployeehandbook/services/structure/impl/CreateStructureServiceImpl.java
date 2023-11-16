@@ -5,7 +5,6 @@ import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structure.CreateStructureDTO;
 import kg.mega.projectemployeehandbook.models.entities.Structure;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
-import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
 import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
@@ -36,15 +35,13 @@ public class CreateStructureServiceImpl implements CreateStructureService {
         Structure structureMaster = commonRepositoryUtil.getEntityById(
             createStructureDTO.getMasterId(),
             structureRepository,
-            ErrorDescription.STRUCTURE_ID_NOT_FOUND,
-            ExceptionType.CREATE_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_ID_NOT_FOUND
         );
 
         StructureType structureType = commonRepositoryUtil.getEntityById(
             createStructureDTO.getStructureTypeId(),
             structureTypeRepository,
-            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND,
-            ExceptionType.CREATE_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND
         );
 
         Structure structure = new Structure(

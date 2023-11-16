@@ -41,8 +41,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         Structure structure = commonRepositoryUtil.getEntityById(
             editStructureDTO.getStructureId(),
             structureRepository,
-            ErrorDescription.STRUCTURE_ID_NOT_FOUND,
-            ExceptionType.EDIT_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_ID_NOT_FOUND
         );
 
         if (!validateEditStructure(editStructureDTO, structure)) {
@@ -73,8 +72,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         Structure masterStructure = commonRepositoryUtil.getEntityById(
             newMasterId,
             structureRepository,
-            ErrorDescription.STRUCTURE_ID_NOT_FOUND,
-            ExceptionType.EDIT_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_ID_NOT_FOUND
         );
 
         if (Objects.equals(structure.getMaster(), masterStructure)) {
@@ -96,8 +94,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         StructureType structureType = commonRepositoryUtil.getEntityById(
             newStructureTypeId,
             structureTypeRepository,
-            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND,
-            ExceptionType.EDIT_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND
         );
 
         if (Objects.equals(structure.getStructureType(), structureType)) {

@@ -38,8 +38,7 @@ public class EditPositionServiceImpl implements EditPositionService {
         Position position = commonRepositoryUtil.getEntityById(
             editPositionDTO.getEditedPositionId(),
             positionRepository,
-            ErrorDescription.POSITION_ID_NOT_FOUND,
-            ExceptionType.EDIT_ENTITY_EXCEPTION
+            ErrorDescription.POSITION_ID_NOT_FOUND
         );
 
         if (!validateEditPosition(editPositionDTO, position)) {
@@ -69,8 +68,7 @@ public class EditPositionServiceImpl implements EditPositionService {
         Position masterPosition = commonRepositoryUtil.getEntityById(
             newMasterId,
             positionRepository,
-            ErrorDescription.POSITION_ID_NOT_FOUND,
-            ExceptionType.EDIT_ENTITY_EXCEPTION
+            ErrorDescription.POSITION_ID_NOT_FOUND
         );
 
         if (Objects.equals(position.getMaster(), masterPosition)) {

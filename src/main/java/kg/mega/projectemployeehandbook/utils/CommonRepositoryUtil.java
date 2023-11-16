@@ -29,14 +29,12 @@ public class CommonRepositoryUtil {
      * @param entityId       Идентификатор сущности, которую нужно получить.
      * @param repository     CrudRepository для сущности.
      * @param errorMessage   Сообщение об ошибке для записи в случае неудачи.
-     * @param exceptionType  Тип исключения для выброса в случае неудачи.
      * @return Полученная сущность или null, если не найдена.
      */
     public <E> E getEntityById(
         Long entityId,
         CrudRepository<E, Long> repository,
-        String errorMessage,
-        ExceptionType exceptionType
+        String errorMessage
     ) {
         if (entityId == null) {
             errorCollectorService.addErrorMessages(
@@ -51,7 +49,7 @@ public class CommonRepositoryUtil {
                 errorCollectorService.addErrorMessages(
                     of(errorMessage)
                 );
-                errorCollectorService.callException(exceptionType);
+                errorCollectorService.callException(ExceptionType.GET_ENTITY_EXCEPTION);
                 return null;
             });
     }

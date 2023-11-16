@@ -19,8 +19,12 @@ public class CreateEmployeeDTO {
         message = ErrorDescription.NAME_PATTERN
     ) String
         firstname,
-        lastname,
-        patronimyc;
+        lastname;
+
+    @Pattern(
+        regexp  = PatternConfiguration.EMPLOYEE_OPTIONAL_NAME_PATTERN,
+        message = ErrorDescription.NAME_PATTERN
+    ) String patronimyc;
 
     /* Персональный номер */
     String personalNumber;

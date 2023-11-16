@@ -23,20 +23,16 @@ import kg.mega.projectemployeehandbook.services.employee.CreateEmployeeService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
+import kg.mega.projectemployeehandbook.utils.EmployeeDateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static java.lang.String.*;
-import static java.time.LocalDate.*;
-import static java.util.List.of;
 import static lombok.AccessLevel.PRIVATE;
-
-// TODO: 13.11.2023 отрефакторить говной
 
 @Service
 @RequiredArgsConstructor
@@ -45,84 +41,28 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     EmployeeStructureRepository employeeStructureRepository;
     EmployeePositionRepository  employeePositionRepository;
     EmployeeStatusRepository    employeeStatusRepository;
-    ValidationUniqueService     validationUniqueService;
-    ErrorCollectorService       errorCollectorService;
-    CommonRepositoryUtil        commonRepositoryUtil;
     StructureRepository         structureRepository;
     PositionRepository          positionRepository;
     EmployeeRepository          employeeRepository;
-    LoggingService              loggingService;
+
+    ValidationUniqueService validationUniqueService;
+    ErrorCollectorService   errorCollectorService;
+    LoggingService          loggingService;
+
+    CommonRepositoryUtil commonRepositoryUtil;
+    EmployeeDateUtil     employeeDateUtil;
 
     @Override
     @Transactional
     public String createEmployee(CreateEmployeeDTO createEmployeeDTO) {
         errorCollectorService.cleanup();
 
-        FamilyStatus familyStatus = commonRepositoryUtil.getEnumByStringName(FamilyStatus.class, createEmployeeDTO.getFamilyStatus());
+        validateEmployeeData(createEmployeeDTO);
+        validateUniqueEmployeeData(createEmployeeDTO);
 
-        if (familyStatus == null) {
-            errorCollectorService.addErrorMessages(
-                of(ErrorDescription.FAMILY_STATUS_IS_EMPTY)
-            );
-        }
-
-        Status status = commonRepositoryUtil.getEnumByStringName(Status.class, createEmployeeDTO.getStatus());
-
-        if (status == null) {
-            errorCollectorService.addErrorMessages(
-                of(ErrorDescription.STATUS_IS_EMPTY)
-            );
-        }
-
-        if (createEmployeeDTO.getPersonalNumber().isBlank()) {
-            errorCollectorService.addErrorMessages(
-                of(ErrorDescription.PERSONAL_NUMBER_PATTERN)
-            );
-        } else {
-            if (!validationUniqueService.isUniqueEmployeePersonalNumber(createEmployeeDTO.getPersonalNumber())) {
-                errorCollectorService.addErrorMessages(
-                    of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
-                );
-            }
-        }
-
-        if (!validationUniqueService.isUniquePhone(createEmployeeDTO.getPhone())) {
-            errorCollectorService.addErrorMessages(
-                of(ErrorDescription.PHONE_UNIQUE)
-            );
-        }
-
-        if (!validationUniqueService.isUniqueEmail(createEmployeeDTO.getEmail())) {
-            errorCollectorService.addErrorMessages(
-                of(ErrorDescription.EMAIL_UNIQUE)
-            );
-        }
-
-        if (createEmployeeDTO.getPathPhoto().isBlank()) {
-            errorCollectorService.addErrorMessages(
-                of(ErrorDescription.PHOTO_NULL)
-            );
-        }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-        LocalDate
-            birthDate      = parse(createEmployeeDTO.getBirthDate(),      formatter),
-            employmentDate = parse(createEmployeeDTO.getEmploymentDate(), formatter);
-
-        validateDatePair(createEmployeeDTO.getStructureStartDate(), createEmployeeDTO.getStructureEndDate());
-        validateDatePair(createEmployeeDTO.getPositionStartDate(),  createEmployeeDTO.getPositionEndDate());
-        validateDatePair(createEmployeeDTO.getStatusStartDate(),    createEmployeeDTO.getStatusEndDate());
-
-        LocalDate
-            structureStartDate = startDateParser(createEmployeeDTO.getStructureStartDate(), formatter),
-            positionStartDate  = startDateParser(createEmployeeDTO.getPositionStartDate(),  formatter),
-            statusStartDate    = startDateParser(createEmployeeDTO.getStatusStartDate(),    formatter),
-
-            structureEndDate   = endDateParser(createEmployeeDTO.getStructureEndDate(), formatter),
-            positionEndDate    = endDateParser(createEmployeeDTO.getPositionEndDate(),  formatter),
-            statusEndDate      = endDateParser(createEmployeeDTO.getStatusEndDate() ,   formatter),
-            dismissalDate      = endDateParser(createEmployeeDTO.getDismissalDate(),    formatter);
+        employeeDateUtil.validateDatePair(createEmployeeDTO.getStructureStartDate(), createEmployeeDTO.getStructureEndDate());
+        employeeDateUtil.validateDatePair(createEmployeeDTO.getPositionStartDate(),  createEmployeeDTO.getPositionEndDate());
+        employeeDateUtil.validateDatePair(createEmployeeDTO.getStatusStartDate(),    createEmployeeDTO.getStatusEndDate());
 
         if (errorCollectorService.getErrorOccurred()) {
             errorCollectorService.callException(
@@ -130,79 +70,151 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
             );
         }
 
-        Employee employee = new Employee();
+        FamilyStatus familyStatus = checkEnum(
+            FamilyStatus.class,
+            createEmployeeDTO.getFamilyStatus(),
+            ErrorDescription.FAMILY_STATUS_IS_EMPTY
+        );
+
+        Status status = checkEnum(
+            Status.class,
+            createEmployeeDTO.getStatus(),
+            ErrorDescription.STATUS_IS_EMPTY
+        );
 
         Structure structure = commonRepositoryUtil.getEntityById(
             createEmployeeDTO.getStructureId(),
             structureRepository,
-            ErrorDescription.STRUCTURE_ID_NOT_FOUND,
-            ExceptionType.CREATE_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_ID_NOT_FOUND
         );
 
         Position position = commonRepositoryUtil.getEntityById(
             createEmployeeDTO.getPositionId(),
             positionRepository,
-            ErrorDescription.POSITION_ID_NOT_FOUND,
-            ExceptionType.CREATE_ENTITY_EXCEPTION
+            ErrorDescription.POSITION_ID_NOT_FOUND
         );
 
-        employee.setFirstname(createEmployeeDTO.getFirstname());
-        employee.setLastname(createEmployeeDTO.getLastname());
-        employee.setPatronimyc(createEmployeeDTO.getPatronimyc());
-        employee.setPersonalNumber(createEmployeeDTO.getPersonalNumber());
-        employee.setPhone(createEmployeeDTO.getPhone());
-        employee.setEmail(createEmployeeDTO.getEmail());
-        employee.setPathPhoto(createEmployeeDTO.getPathPhoto());
-        employee.setPostalAddress(createEmployeeDTO.getPostalAddress());
-        employee.setFamilyStatus(familyStatus);
-        employee.setBirthDate(birthDate);
-        employee.setEmploymentDate(employmentDate);
-        employee.setDismissalDate(dismissalDate);
-        employeeRepository.save(employee);
+        Employee employee = employeeBuilder(createEmployeeDTO, familyStatus);
 
-        EmployeeStructure employeeStructure = new EmployeeStructure();
-        employeeStructure.setEmployee(employee);
-        employeeStructure.setStructure(structure);
-        employeeStructure.setStartDate(structureStartDate);
-        employeeStructure.setEndDate(structureEndDate);
-        employeeStructureRepository.save(employeeStructure);
+        EmployeeStructure employeeStructure = employeeStructureBuilder(employee, structure, createEmployeeDTO.getStructureStartDate(), createEmployeeDTO.getStructureEndDate());
+        EmployeePosition  employeePosition  = employeePositionBuilder(employee, position, createEmployeeDTO.getPositionStartDate(), createEmployeeDTO.getPositionEndDate());
+        EmployeeStatus    employeeStatus    = employeeStatusBuilder(employee, status, createEmployeeDTO.getStatusStartDate(), createEmployeeDTO.getStatusEndDate());
 
-        EmployeePosition employeePosition = new EmployeePosition();
-        employeePosition.setEmployee(employee);
-        employeePosition.setPosition(position);
-        employeePosition.setStartDate(positionStartDate);
-        employeePosition.setEndDate(positionEndDate);
-        employeePositionRepository.save(employeePosition);
-
-        EmployeeStatus employeeStatus = new EmployeeStatus();
-        employeeStatus.setEmployee(employee);
-        employeeStatus.setStatus(status);
-        employeeStatus.setStartDate(statusStartDate);
-        employeeStatus.setEndDate(statusEndDate);
-        employeeStatusRepository.save(employeeStatus);
+        saveEntities(employee, employeeStructure, employeePosition, employeeStatus);
 
         String operationSuccessMessage = format(InfoDescription.CREATE_EMPLOYEE_FORMAT, employee.getId());
         loggingService.logInfo(operationSuccessMessage);
         return operationSuccessMessage;
     }
 
-    private void validateDatePair(String startDate, String endDate) {
-        if (!endDate.isBlank() && startDate.isBlank()) {
+    private EmployeeStatus employeeStatusBuilder(
+        Employee employee,
+        Status status,
+        String startDate,
+        String endDate
+    ) {
+        return EmployeeStatus.builder()
+            .employee(employee)
+            .status(status)
+            .startDate(employeeDateUtil.parseOrNow(startDate))
+            .endDate(employeeDateUtil.parseDate(endDate))
+            .build();
+    }
+
+    private EmployeePosition employeePositionBuilder(
+        Employee employee,
+        Position position,
+        String startDate,
+        String endDate
+    ) {
+        return EmployeePosition.builder()
+            .employee(employee)
+            .position(position)
+            .startDate(employeeDateUtil.parseOrNow(startDate))
+            .endDate(employeeDateUtil.parseDate(endDate))
+            .build();
+    }
+
+    private EmployeeStructure employeeStructureBuilder(
+        Employee employee,
+        Structure structure,
+        String startDate,
+        String endDate
+    ) {
+        return EmployeeStructure.builder()
+            .employee(employee)
+            .structure(structure)
+            .startDate(employeeDateUtil.parseOrNow(startDate))
+            .endDate(employeeDateUtil.parseDate(endDate))
+            .build();
+    }
+
+    private Employee employeeBuilder(CreateEmployeeDTO createEmployeeDTO, FamilyStatus familyStatus) {
+        return new Employee(
+            createEmployeeDTO,
+            familyStatus,
+            employeeDateUtil.parseDate(createEmployeeDTO.getBirthDate()),
+            employeeDateUtil.parseDate(createEmployeeDTO.getEmploymentDate()),
+            employeeDateUtil.parseDate(createEmployeeDTO.getDismissalDate())
+        );
+    }
+
+    private void validateEmployeeData (CreateEmployeeDTO createEmployeeDTO) {
+        if (createEmployeeDTO.getPathPhoto().isBlank()) {
             errorCollectorService.addErrorMessages(
-                of(format(ErrorDescription.END_DATE_IS_PRESENT_BUT_START_DATE_IS_NULL_FORMAT, endDate))
+                List.of(ErrorDescription.PHOTO_NULL)
+            );
+        }
+        if (createEmployeeDTO.getPatronimyc().isBlank()) {
+            createEmployeeDTO.setPatronimyc(null);
+        }
+    }
+
+    private void validateUniqueEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
+        if (createEmployeeDTO.getPersonalNumber().isBlank()) {
+            errorCollectorService.addErrorMessages(
+                List.of(ErrorDescription.PERSONAL_NUMBER_PATTERN)
+            );
+        } else {
+            if (!validationUniqueService.isUniqueEmployeePersonalNumber(createEmployeeDTO.getPersonalNumber())) {
+                errorCollectorService.addErrorMessages(
+                    List.of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
+                );
+            }
+        }
+        if (!validationUniqueService.isUniquePhone(createEmployeeDTO.getPhone())) {
+            errorCollectorService.addErrorMessages(
+                List.of(ErrorDescription.PHONE_UNIQUE)
+            );
+        }
+        if (!validationUniqueService.isUniqueEmail(createEmployeeDTO.getEmail())) {
+            errorCollectorService.addErrorMessages(
+                List.of(ErrorDescription.EMAIL_UNIQUE)
             );
         }
     }
 
-    private LocalDate startDateParser(String startDate, DateTimeFormatter formatter) {
-        return startDate.isBlank()
-            ? LocalDate.now()
-            : parse(startDate, formatter);
+    private <E extends Enum<E>> E checkEnum(Class<E> enumCLass, String enumName, String errorMessage) {
+        E enumObject = commonRepositoryUtil.getEnumByStringName(enumCLass, enumName);
+
+        if (enumObject == null) {
+            errorCollectorService.addErrorMessages(
+                List.of(errorMessage)
+            );
+        }
+
+        return enumObject;
     }
 
-    private LocalDate endDateParser(String endDate, DateTimeFormatter formatter) {
-        return endDate.isBlank()
-            ? null
-            : parse(endDate, formatter);
+    private void saveEntities(
+        Employee employee,
+        EmployeeStructure employeeStructure,
+        EmployeePosition employeePosition,
+        EmployeeStatus employeeStatus
+    ) {
+        employeeRepository.save(employee);
+        employeeStructureRepository.save(employeeStructure);
+        employeePositionRepository.save(employeePosition);
+        employeeStatusRepository.save(employeeStatus);
     }
 }

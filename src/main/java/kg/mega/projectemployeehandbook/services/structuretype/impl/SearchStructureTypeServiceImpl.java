@@ -2,7 +2,6 @@ package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.GetStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
@@ -41,8 +40,8 @@ public class SearchStructureTypeServiceImpl implements SearchStructureTypeServic
             StructureType structureTypeFindById = commonRepositoryUtil.getEntityById(
                 structureTypeId,
                 structureTypeRepository,
-                ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND,
-                ExceptionType.GET_ENTITY_EXCEPTION);
+                ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND
+            );
             resultSearch.add(structureTypeFindById);
         } catch (NumberFormatException e) {
             // Исключение игнорируется, так как searchField не является ID.

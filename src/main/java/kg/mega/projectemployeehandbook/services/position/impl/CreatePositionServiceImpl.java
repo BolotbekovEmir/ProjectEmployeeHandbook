@@ -4,7 +4,6 @@ import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.position.CreatePositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
-import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
 import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
@@ -35,8 +34,7 @@ public class CreatePositionServiceImpl implements CreatePositionService {
             masterPosition = commonRepositoryUtil.getEntityById(
                 createPositionDTO.getMasterId(),
                 positionRepository,
-                ErrorDescription.POSITION_ID_NOT_FOUND,
-                ExceptionType.CREATE_ENTITY_EXCEPTION
+                ErrorDescription.POSITION_ID_NOT_FOUND
             );
 
         position.setPositionName(createPositionDTO.getPositionName());

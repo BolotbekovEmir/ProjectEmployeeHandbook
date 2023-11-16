@@ -36,8 +36,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         StructureType structureType = commonRepositoryUtil.getEntityById(
             editStructureTypeDTO.getStructureTypeId(),
             structureTypeRepository,
-            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND,
-            ExceptionType.EDIT_ENTITY_EXCEPTION
+            ErrorDescription.STRUCTURE_TYPE_ID_NOT_FOUND
         );
 
         if (!validateEditStructureType(editStructureTypeDTO, structureType)) {

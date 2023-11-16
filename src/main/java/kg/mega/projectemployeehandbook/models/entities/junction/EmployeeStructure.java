@@ -17,6 +17,7 @@ import static lombok.AccessLevel.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @FieldDefaults(level = PRIVATE)
 public class EmployeeStructure {
 

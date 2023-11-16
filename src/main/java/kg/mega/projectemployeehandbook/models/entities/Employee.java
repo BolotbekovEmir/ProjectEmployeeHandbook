@@ -1,5 +1,6 @@
 package kg.mega.projectemployeehandbook.models.entities;
 
+import kg.mega.projectemployeehandbook.models.dto.employee.CreateEmployeeDTO;
 import kg.mega.projectemployeehandbook.models.enums.FamilyStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,7 +16,7 @@ import static lombok.AccessLevel.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Builder
 @FieldDefaults(level = PRIVATE)
 public class Employee {
 
@@ -56,4 +57,24 @@ public class Employee {
 
     LocalDate dismissalDate;
 
+    public Employee(
+        CreateEmployeeDTO createEmployeeDTO,
+        FamilyStatus familyStatus,
+        LocalDate birthDate,
+        LocalDate employmentDate,
+        LocalDate dismissalDate
+    ) {
+        this.firstname = createEmployeeDTO.getFirstname();
+        this.lastname = createEmployeeDTO.getLastname();
+        this.patronimyc = createEmployeeDTO.getPatronimyc();
+        this.personalNumber = createEmployeeDTO.getPersonalNumber();
+        this.phone = createEmployeeDTO.getPhone();
+        this.email = createEmployeeDTO.getEmail();
+        this.pathPhoto = createEmployeeDTO.getPathPhoto();
+        this.postalAddress = createEmployeeDTO.getPostalAddress();
+        this.familyStatus = familyStatus;
+        this.birthDate = birthDate;
+        this.employmentDate = employmentDate;
+        this.dismissalDate = dismissalDate;
+    }
 }
