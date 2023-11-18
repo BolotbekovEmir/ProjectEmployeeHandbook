@@ -24,6 +24,7 @@ public class SearchStructureServiceImpl implements SearchStructureService {
 
     @Override
     public Set<String> searchStructure(String searchField) {
+        System.out.println(searchField);
         Set<Structure> structures = structureRepository.findAllByStructureNameContainsIgnoreCaseAndActiveIsTrue(searchField);
 
         try {

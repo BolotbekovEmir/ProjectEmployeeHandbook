@@ -1,7 +1,7 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
@@ -26,10 +26,10 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateAdminServiceImpl implements CreateAdminService {
     ValidationUniqueService validationUniqueService;
-    ErrorCollectorService   errorCollectorService;
-    AdminRepository         adminRepository;
-    LoggingService          loggingService;
-    MapperConfiguration     mapper;
+    ErrorCollectorService errorCollectorService;
+    AdminRepository adminRepository;
+    LoggingService loggingService;
+    MapperConfiguration mapper;
 
     @Override
     @Transactional
@@ -61,15 +61,9 @@ public class CreateAdminServiceImpl implements CreateAdminService {
             );
         }
 
-        if (!createAdminDTO.getPersonalNumber().isBlank()) {
-            if (!validationUniqueService.isUniqueAdminPersonalNumber(createAdminDTO.getPersonalNumber())) {
-                errorCollectorService.addErrorMessages(
-                    of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
-                );
-            }
-        } else {
+        if (!validationUniqueService.isUniqueAdminPersonalNumber(createAdminDTO.getPersonalNumber())) {
             errorCollectorService.addErrorMessages(
-                of(ErrorDescription.PERSONAL_NUMBER_PATTERN)
+                of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
             );
         }
 

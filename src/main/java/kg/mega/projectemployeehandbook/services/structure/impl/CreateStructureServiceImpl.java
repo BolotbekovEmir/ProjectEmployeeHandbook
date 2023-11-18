@@ -7,7 +7,7 @@ import kg.mega.projectemployeehandbook.models.entities.Structure;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structure.CreateStructureService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;

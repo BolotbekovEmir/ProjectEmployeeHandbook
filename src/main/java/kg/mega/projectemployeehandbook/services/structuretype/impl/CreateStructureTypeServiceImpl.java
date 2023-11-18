@@ -7,7 +7,7 @@ import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.CreateStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structuretype.CreateStructureTypeService;
 import lombok.RequiredArgsConstructor;

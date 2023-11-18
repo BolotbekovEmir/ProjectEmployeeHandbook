@@ -7,7 +7,7 @@ import kg.mega.projectemployeehandbook.models.dto.admin.EditAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.enums.AdminRole;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.admin.EditAdminService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;

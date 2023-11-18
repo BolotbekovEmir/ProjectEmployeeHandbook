@@ -23,7 +23,6 @@ public class PositionController {
     SearchPositionService searchPositionService;
     EditPositionService   editPositionService;
 
-    /* Создание позиции */
     @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody CreatePositionDTO createPositionDTO) {
         return ResponseEntity.ok().body(
@@ -36,7 +35,6 @@ public class PositionController {
         );
     }
 
-    /* Изменение позиции */
     @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody EditPositionDTO editPositionDTO) {
         return ResponseEntity.ok().body(
@@ -49,9 +47,8 @@ public class PositionController {
         );
     }
 
-    /* Поиск позиции */
-    @GetMapping("{searchField}")
-    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
+    @GetMapping("find-by")
+    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)

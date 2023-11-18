@@ -1,4 +1,4 @@
-package kg.mega.projectemployeehandbook.services;
+package kg.mega.projectemployeehandbook.errors;
 
 import kg.mega.projectemployeehandbook.errors.exceptions.CreateEntityException;
 import kg.mega.projectemployeehandbook.errors.exceptions.EditEntityException;

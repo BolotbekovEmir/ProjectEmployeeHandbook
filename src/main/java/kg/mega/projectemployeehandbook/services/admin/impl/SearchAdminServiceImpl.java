@@ -27,6 +27,7 @@ public class SearchAdminServiceImpl implements SearchAdminService {
 
     @Override
     public Set<GetAdminDTO> searchAdmins(String searchField) {
+        System.out.println(searchField);
         Set<Admin>
             adminsByName           = adminRepository.findAllByAdminNameContainsIgnoreCase(searchField),
             adminsByPersonalNumber = adminRepository.findAllByPersonalNumber(searchField),

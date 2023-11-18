@@ -25,7 +25,6 @@ public class AdminController {
     AuthAdminService           authAdminService;
     EditAdminService           editAdminService;
 
-    /* Создание администратора */
     @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
         return ResponseEntity.ok().body(
@@ -38,7 +37,6 @@ public class AdminController {
         );
     }
 
-    /* Изменение администратора системным администратором */
     @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody @Valid EditAdminDTO editAdminDTO) {
         return ResponseEntity.ok().body(
@@ -51,9 +49,8 @@ public class AdminController {
         );
     }
 
-    /* Поиск администратора */
-    @GetMapping("{searchField}")
-    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
+    @GetMapping("find-by")
+    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)
@@ -64,8 +61,7 @@ public class AdminController {
         );
     }
 
-    /* Изменение пароля администратора самим администратором */
-    @PatchMapping("changePassword")
+    @PatchMapping("change-password")
     public ResponseEntity<ApiResult> changePassword(@RequestBody @Valid ChangeAdminPasswordDTO changeAdminPasswordDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -77,7 +73,6 @@ public class AdminController {
         );
     }
 
-    /* Аутентификация администратора */
     @PostMapping("auth")
     public ResponseEntity<ApiResult> adminAuth(@RequestBody @Valid AuthAdminDTO authAdminDTO) {
         return ResponseEntity.ok().body(

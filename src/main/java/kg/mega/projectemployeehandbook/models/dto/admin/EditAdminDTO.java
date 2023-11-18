@@ -16,22 +16,19 @@ public class EditAdminDTO {
     @Pattern(
         regexp = EDIT_ADMIN_NAME_PATTERN,
         message = ErrorDescription.ADMIN_NAME_PATTERN
-    )
-    String searchedAdminName;
+    ) String searchedAdminName;
 
     @Pattern(
         regexp = EDIT_ADMIN_NAME_PATTERN,
         message = ErrorDescription.ADMIN_NAME_PATTERN
-    )
-    String newAdminName;
+    ) String newAdminName;
 
     String newPersonalNumber;
 
     @Pattern(
         regexp = PASSWORD_OPTIONAL_PATTERN,
         message = ErrorDescription.PASSWORD_PATTERN
-    )
-    String newPassword;
+    ) String newPassword;
 
     String confirmNewPassword;
 

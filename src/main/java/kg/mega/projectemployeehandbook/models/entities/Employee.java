@@ -2,6 +2,7 @@ package kg.mega.projectemployeehandbook.models.entities;
 
 import kg.mega.projectemployeehandbook.models.dto.employee.CreateEmployeeDTO;
 import kg.mega.projectemployeehandbook.models.enums.FamilyStatus;
+import kg.mega.projectemployeehandbook.models.enums.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -47,6 +48,10 @@ public class Employee {
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
+    Status status;
+
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     FamilyStatus familyStatus;
 
     @Column(nullable = false)
@@ -60,6 +65,7 @@ public class Employee {
     public Employee(
         CreateEmployeeDTO createEmployeeDTO,
         FamilyStatus familyStatus,
+        Status status,
         LocalDate birthDate,
         LocalDate employmentDate,
         LocalDate dismissalDate
@@ -73,6 +79,7 @@ public class Employee {
         this.pathPhoto = createEmployeeDTO.getPathPhoto();
         this.postalAddress = createEmployeeDTO.getPostalAddress();
         this.familyStatus = familyStatus;
+        this.status = status;
         this.birthDate = birthDate;
         this.employmentDate = employmentDate;
         this.dismissalDate = dismissalDate;

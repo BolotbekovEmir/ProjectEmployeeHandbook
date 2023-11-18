@@ -2,7 +2,7 @@ package kg.mega.projectemployeehandbook.utils;
 
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.repository.CrudRepository;

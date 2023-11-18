@@ -6,7 +6,7 @@ import kg.mega.projectemployeehandbook.models.dto.position.EditPositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.position.EditPositionService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;

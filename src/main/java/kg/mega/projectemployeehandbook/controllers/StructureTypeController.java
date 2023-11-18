@@ -15,7 +15,7 @@ import static lombok.AccessLevel.*;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@RequestMapping("/api/v1/structureTypes")
+@RequestMapping("/api/v1/structure-types")
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class StructureTypeController {
@@ -23,7 +23,6 @@ public class StructureTypeController {
     SearchStructureTypeService searchStructureTypeService;
     EditStructureTypeService   editStructureTypeService;
 
-    /* Создание типа структуры */
     @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureTypeDTO createStructureTypeDTO) {
         return ResponseEntity.ok().body(
@@ -36,7 +35,6 @@ public class StructureTypeController {
         );
     }
 
-    /* Изменение типа структуры */
     @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody EditStructureTypeDTO editStructureTypeDTO) {
         return ResponseEntity.ok().body(
@@ -49,9 +47,8 @@ public class StructureTypeController {
         );
     }
 
-    /* Получение типа структур */
-    @GetMapping("{searchField}")
-    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
+    @GetMapping("find-by")
+    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)

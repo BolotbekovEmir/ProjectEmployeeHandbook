@@ -11,8 +11,11 @@ public class PatternConfiguration {
         PASSWORD_PATTERN               = "^(?=.*[A-Za-z\\d])(?=.*[^A-Za-z\\d]).{8,32}$",
         PASSWORD_OPTIONAL_PATTERN      = "^(|(?=.*[A-Za-z\\d])(?=.*[^A-Za-z\\d]).{8,32})$",
         PHONE_PATTERN                  = "^\\+996\\d{9}$",
+        PHONE_OPTIONAL_PATTERN         = "^(|\\+996\\d{9})$",
         EMAIL_PATTERN                  = "^[A-Za-z\\d+_.-]+@(.+)$",
+        EMAIL_OPTIONAL_PATTERN         = "^(|[A-Za-z\\d+_.-]+@(.+))$",
         ADDRESS_PATTERN                = "^[A-Za-zА-Яа-я\\d-.,\\s]{4,52}$",
+        ADDRESS_OPTIONAL_PATTERN       = "^(|[A-Za-zА-Яа-я\\d-.,\\s]{4,52})$",
         DATE_PATTERN                   = "^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$",
         DATE_OPTIONAL_PATTERN          = "^(|(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4}))$";
 

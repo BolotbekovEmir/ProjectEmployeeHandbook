@@ -25,6 +25,7 @@ public class InfoDescription {
 
         /* Сообщения для сотрудников */
 
-        CREATE_EMPLOYEE_FORMAT = "Создан сотрудник с ID '%d'";
+        CREATE_EMPLOYEE_FORMAT = "Создан сотрудник с ID '%d'",
+        EDIT_EMPLOYEE_PROFILE_FORMAT = "Изменен профиль сотрудника с персональным номером '%s'";
 
 }

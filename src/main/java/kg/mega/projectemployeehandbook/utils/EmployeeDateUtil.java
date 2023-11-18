@@ -1,7 +1,7 @@
 package kg.mega.projectemployeehandbook.utils;
 
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class EmployeeDateUtil {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    public LocalDate parseDate(String date) {
+    public LocalDate parseOrNull(String date) {
         return date.isBlank()
             ? null
             : LocalDate.parse(date, formatter);

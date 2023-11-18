@@ -5,6 +5,7 @@ import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import static lombok.AccessLevel.*;
@@ -27,6 +28,7 @@ public class CreateEmployeeDTO {
     ) String patronimyc;
 
     /* Персональный номер */
+    @NotBlank(message = ErrorDescription.PERSONAL_NUMBER_IS_EMPTY)
     String personalNumber;
 
     /* Номер телефона */

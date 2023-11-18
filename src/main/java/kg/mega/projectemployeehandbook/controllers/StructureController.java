@@ -24,7 +24,6 @@ public class StructureController {
     SearchStructureService searchStructureService;
     EditStructureService   editStructureService;
 
-    /* Создание структуры */
     @PostMapping
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureDTO createStructureDTO) {
         return ResponseEntity.ok().body(
@@ -37,7 +36,6 @@ public class StructureController {
         );
     }
 
-    /* Изменение структуры */
     @PatchMapping
     public ResponseEntity<ApiResult> edit(@RequestBody EditStructureDTO editStructureDTO) {
         return ResponseEntity.ok().body(
@@ -50,9 +48,8 @@ public class StructureController {
         );
     }
 
-    /* Получение структуры */
-    @GetMapping("{searchField}")
-    public ResponseEntity<ApiResult> search(@PathVariable String searchField) {
+    @GetMapping("find-by")
+    public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
                 .httpStatus(OK)

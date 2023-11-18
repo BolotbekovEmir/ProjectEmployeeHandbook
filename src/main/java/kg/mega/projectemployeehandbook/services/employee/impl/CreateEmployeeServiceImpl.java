@@ -7,7 +7,6 @@ import kg.mega.projectemployeehandbook.models.entities.Employee;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.models.entities.Structure;
 import kg.mega.projectemployeehandbook.models.entities.junction.EmployeePosition;
-import kg.mega.projectemployeehandbook.models.entities.junction.EmployeeStatus;
 import kg.mega.projectemployeehandbook.models.entities.junction.EmployeeStructure;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.models.enums.FamilyStatus;
@@ -16,9 +15,8 @@ import kg.mega.projectemployeehandbook.repositories.EmployeeRepository;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeePositionRepository;
-import kg.mega.projectemployeehandbook.repositories.junction.EmployeeStatusRepository;
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeeStructureRepository;
-import kg.mega.projectemployeehandbook.services.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
 import kg.mega.projectemployeehandbook.services.employee.CreateEmployeeService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
@@ -39,18 +37,17 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     EmployeeStructureRepository employeeStructureRepository;
-    EmployeePositionRepository  employeePositionRepository;
-    EmployeeStatusRepository    employeeStatusRepository;
-    StructureRepository         structureRepository;
-    PositionRepository          positionRepository;
-    EmployeeRepository          employeeRepository;
+    EmployeePositionRepository employeePositionRepository;
+    StructureRepository structureRepository;
+    PositionRepository positionRepository;
+    EmployeeRepository employeeRepository;
 
     ValidationUniqueService validationUniqueService;
-    ErrorCollectorService   errorCollectorService;
-    LoggingService          loggingService;
+    ErrorCollectorService errorCollectorService;
+    LoggingService loggingService;
 
     CommonRepositoryUtil commonRepositoryUtil;
-    EmployeeDateUtil     employeeDateUtil;
+    EmployeeDateUtil employeeDateUtil;
 
     @Override
     @Transactional
@@ -61,8 +58,8 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         validateUniqueEmployeeData(createEmployeeDTO);
 
         employeeDateUtil.validateDatePair(createEmployeeDTO.getStructureStartDate(), createEmployeeDTO.getStructureEndDate());
-        employeeDateUtil.validateDatePair(createEmployeeDTO.getPositionStartDate(),  createEmployeeDTO.getPositionEndDate());
-        employeeDateUtil.validateDatePair(createEmployeeDTO.getStatusStartDate(),    createEmployeeDTO.getStatusEndDate());
+        employeeDateUtil.validateDatePair(createEmployeeDTO.getPositionStartDate(), createEmployeeDTO.getPositionEndDate());
+        employeeDateUtil.validateDatePair(createEmployeeDTO.getStatusStartDate(), createEmployeeDTO.getStatusEndDate());
 
         if (errorCollectorService.getErrorOccurred()) {
             errorCollectorService.callException(
@@ -94,31 +91,15 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
             ErrorDescription.POSITION_ID_NOT_FOUND
         );
 
-        Employee employee = employeeBuilder(createEmployeeDTO, familyStatus);
-
+        Employee employee = employeeBuilder(createEmployeeDTO, familyStatus, status);
         EmployeeStructure employeeStructure = employeeStructureBuilder(employee, structure, createEmployeeDTO.getStructureStartDate(), createEmployeeDTO.getStructureEndDate());
-        EmployeePosition  employeePosition  = employeePositionBuilder(employee, position, createEmployeeDTO.getPositionStartDate(), createEmployeeDTO.getPositionEndDate());
-        EmployeeStatus    employeeStatus    = employeeStatusBuilder(employee, status, createEmployeeDTO.getStatusStartDate(), createEmployeeDTO.getStatusEndDate());
+        EmployeePosition employeePosition = employeePositionBuilder(employee, position, createEmployeeDTO.getPositionStartDate(), createEmployeeDTO.getPositionEndDate());
 
-        saveEntities(employee, employeeStructure, employeePosition, employeeStatus);
+        saveEntities(employee, employeeStructure, employeePosition);
 
         String operationSuccessMessage = format(InfoDescription.CREATE_EMPLOYEE_FORMAT, employee.getId());
         loggingService.logInfo(operationSuccessMessage);
         return operationSuccessMessage;
-    }
-
-    private EmployeeStatus employeeStatusBuilder(
-        Employee employee,
-        Status status,
-        String startDate,
-        String endDate
-    ) {
-        return EmployeeStatus.builder()
-            .employee(employee)
-            .status(status)
-            .startDate(employeeDateUtil.parseOrNow(startDate))
-            .endDate(employeeDateUtil.parseDate(endDate))
-            .build();
     }
 
     private EmployeePosition employeePositionBuilder(
@@ -131,7 +112,7 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
             .employee(employee)
             .position(position)
             .startDate(employeeDateUtil.parseOrNow(startDate))
-            .endDate(employeeDateUtil.parseDate(endDate))
+            .endDate(employeeDateUtil.parseOrNull(endDate))
             .build();
     }
 
@@ -145,21 +126,22 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
             .employee(employee)
             .structure(structure)
             .startDate(employeeDateUtil.parseOrNow(startDate))
-            .endDate(employeeDateUtil.parseDate(endDate))
+            .endDate(employeeDateUtil.parseOrNull(endDate))
             .build();
     }
 
-    private Employee employeeBuilder(CreateEmployeeDTO createEmployeeDTO, FamilyStatus familyStatus) {
+    private Employee employeeBuilder(CreateEmployeeDTO createEmployeeDTO, FamilyStatus familyStatus, Status status) {
         return new Employee(
             createEmployeeDTO,
             familyStatus,
-            employeeDateUtil.parseDate(createEmployeeDTO.getBirthDate()),
-            employeeDateUtil.parseDate(createEmployeeDTO.getEmploymentDate()),
-            employeeDateUtil.parseDate(createEmployeeDTO.getDismissalDate())
+            status,
+            employeeDateUtil.parseOrNull(createEmployeeDTO.getBirthDate()),
+            employeeDateUtil.parseOrNull(createEmployeeDTO.getEmploymentDate()),
+            employeeDateUtil.parseOrNull(createEmployeeDTO.getDismissalDate())
         );
     }
 
-    private void validateEmployeeData (CreateEmployeeDTO createEmployeeDTO) {
+    private void validateEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
         if (createEmployeeDTO.getPathPhoto().isBlank()) {
             errorCollectorService.addErrorMessages(
                 List.of(ErrorDescription.PHOTO_NULL)
@@ -171,16 +153,10 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     }
 
     private void validateUniqueEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
-        if (createEmployeeDTO.getPersonalNumber().isBlank()) {
+        if (!validationUniqueService.isUniqueEmployeePersonalNumber(createEmployeeDTO.getPersonalNumber())) {
             errorCollectorService.addErrorMessages(
-                List.of(ErrorDescription.PERSONAL_NUMBER_PATTERN)
+                List.of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
             );
-        } else {
-            if (!validationUniqueService.isUniqueEmployeePersonalNumber(createEmployeeDTO.getPersonalNumber())) {
-                errorCollectorService.addErrorMessages(
-                    List.of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
-                );
-            }
         }
         if (!validationUniqueService.isUniquePhone(createEmployeeDTO.getPhone())) {
             errorCollectorService.addErrorMessages(
@@ -209,12 +185,10 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     private void saveEntities(
         Employee employee,
         EmployeeStructure employeeStructure,
-        EmployeePosition employeePosition,
-        EmployeeStatus employeeStatus
+        EmployeePosition employeePosition
     ) {
         employeeRepository.save(employee);
         employeeStructureRepository.save(employeeStructure);
         employeePositionRepository.save(employeePosition);
-        employeeStatusRepository.save(employeeStatus);
     }
 }
