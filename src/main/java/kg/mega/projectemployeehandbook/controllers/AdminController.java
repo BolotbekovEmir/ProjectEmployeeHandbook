@@ -68,7 +68,7 @@ public class AdminController {
                 .httpStatus(OK)
                 .statusCode(OK.value())
                 .response(
-                    changeAdminPasswordService.changeAdminPassword(changeAdminPasswordDTO)
+                    changeAdminPasswordService.changePassword(changeAdminPasswordDTO)
                 ).build()
         );
     }
@@ -80,7 +80,7 @@ public class AdminController {
                 .httpStatus(OK)
                 .statusCode(OK.value())
                 .response(
-                    authAdminService.adminAuth(authAdminDTO)
+                    authAdminService.authentication(authAdminDTO)
                 ).build()
         );
     }

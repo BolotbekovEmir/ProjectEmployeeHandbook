@@ -16,13 +16,11 @@ public class AuthAdminDTO {
     @Pattern(
         regexp = PatternConfiguration.ADMIN_NAME_PATTERN,
         message = ErrorDescription.ADMIN_AUTH_INVALID
-    )
-    String adminName;
+    ) String adminName;
 
     @Pattern(
         regexp = PatternConfiguration.PASSWORD_PATTERN,
         message = ErrorDescription.ADMIN_AUTH_INVALID
-    )
-    String password;
+    ) String password;
 
 }

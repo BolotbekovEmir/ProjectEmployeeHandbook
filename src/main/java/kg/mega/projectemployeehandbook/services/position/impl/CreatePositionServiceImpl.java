@@ -5,7 +5,7 @@ import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.position.CreatePositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.position.CreatePositionService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -20,14 +20,16 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreatePositionServiceImpl implements CreatePositionService {
-    ErrorCollectorService errorCollectorService;
-    CommonRepositoryUtil  commonRepositoryUtil;
-    PositionRepository    positionRepository;
-    LoggingService        loggingService;
+    PositionRepository positionRepository;
+
+    LoggingService loggingService;
+
+    CommonRepositoryUtil commonRepositoryUtil;
+    ErrorCollector       errorCollector;
 
     @Override
     public String createPosition(CreatePositionDTO createPositionDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         Position
             position = new Position(),

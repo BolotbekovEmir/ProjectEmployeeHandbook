@@ -7,12 +7,13 @@ import kg.mega.projectemployeehandbook.models.dto.admin.EditAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.enums.AdminRole;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.admin.EditAdminService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,21 +30,25 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditAdminServiceImpl implements EditAdminService {
+    AdminRepository adminRepository;
+
     ValidationUniqueService validationUniqueService;
-    ErrorCollectorService   errorCollectorService;
-    AdminRepository         adminRepository;
     LoggingService          loggingService;
+
+    PasswordEncoder passwordEncoder;
+    ErrorCollector  errorCollector;
+
 
     @Override
     @Transactional
     public String editAdmin(EditAdminDTO editAdminDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         String searchedAdminName = editAdminDTO.getSearchedAdminName();
         Admin admin = getAdminFindByName(searchedAdminName);
 
         if (!validateEditAdmin(editAdminDTO, admin)) {
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         adminRepository.save(Objects.requireNonNull(admin));
@@ -56,7 +61,7 @@ public class EditAdminServiceImpl implements EditAdminService {
     private Admin getAdminFindByName(String adminName) {
         Optional<Admin> optionalAdmin = adminRepository.findByAdminName(adminName);
         if (optionalAdmin.isEmpty()) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.ADMIN_NAME_NOT_FOUND)
             );
         }
@@ -77,13 +82,13 @@ public class EditAdminServiceImpl implements EditAdminService {
             return true;
         }
         if (admin.getAdminName().equals(newAdminName)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.THIS_ADMIN_NAME_ALREADY_USED)
             );
             return false;
         }
         if (!validationUniqueService.isUniqueAdminName(newAdminName)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.ADMIN_NAME_UNIQUE)
             );
             return false;
@@ -97,13 +102,13 @@ public class EditAdminServiceImpl implements EditAdminService {
             return true;
         }
         if (admin.getPersonalNumber().equals(newPersonalNumber)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.THIS_ADMIN_PERSONAL_NUMBER_ALREADY_USED)
             );
             return false;
         }
         if (!validationUniqueService.isUniqueAdminPersonalNumber(newPersonalNumber)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
             );
             return false;
@@ -117,25 +122,24 @@ public class EditAdminServiceImpl implements EditAdminService {
             return true;
         }
         if (admin.getPassword().equals(newPassword)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.THIS_PASSWORD_ALREADY_USED)
             );
             return false;
         }
         if (!newPassword.equals(confirmNewPassword)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.PASSWORDS_EQUAL)
             );
             return false;
         }
-        // TODO: 11.11.2023 Encoder
-        admin.setPassword(newPassword);
+        admin.setPassword(passwordEncoder.encode(newPassword));
         return true;
     }
 
     private boolean checkAndSetAdminRole(boolean disableAdmin, boolean enableAdmin, AdminRole currentRole, Admin admin) {
         if (disableAdmin && currentRole.equals(DISABLE)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.ADMIN_DISABLE)
             );
             return false;
@@ -143,7 +147,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             admin.setAdminRole(DISABLE);
         }
         if (enableAdmin && currentRole.equals(ADMIN)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.ADMIN_ENABLE)
             );
             return false;

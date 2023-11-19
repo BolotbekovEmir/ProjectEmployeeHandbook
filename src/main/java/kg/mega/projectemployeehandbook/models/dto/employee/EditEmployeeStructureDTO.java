@@ -26,7 +26,7 @@ public class EditEmployeeStructureDTO {
         startDate,
         endDate;
 
-    boolean
+    Boolean
         isAddedOperation,
         isRemoveOperation;
 

@@ -12,6 +12,6 @@ import java.util.Set;
 @Repository
 public interface EmployeeStructureRepository extends JpaRepository<EmployeeStructure, Long> {
     Set<EmployeeStructure> findAllByStructure(Structure structure);
-    Set<EmployeeStructure> findAllByEmployee(Employee employee);
+    Set<EmployeeStructure> findAllByEmployeeAndEndDateIsNull(Employee employee);
     Optional<EmployeeStructure> findByEmployee_PersonalNumberAndStructureId(String personalNumber, Long structureId);
 }

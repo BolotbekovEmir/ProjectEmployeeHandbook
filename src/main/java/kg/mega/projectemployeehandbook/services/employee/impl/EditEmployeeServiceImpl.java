@@ -1,6 +1,6 @@
 package kg.mega.projectemployeehandbook.services.employee.impl;
 
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.employee.EditEmployeePositionDTO;
@@ -44,24 +44,24 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
     EmployeeRepository          employeeRepository;
     PositionRepository          positionRepository;
 
-    ValidationUniqueService     validationUniqueService;
-    ErrorCollectorService       errorCollectorService;
-    LoggingService              loggingService;
+    ValidationUniqueService validationUniqueService;
+    LoggingService          loggingService;
 
-    CommonRepositoryUtil        commonRepositoryUtil;
-    EmployeeDateUtil            employeeDateUtil;
+    CommonRepositoryUtil commonRepositoryUtil;
+    EmployeeDateUtil     employeeDateUtil;
+    ErrorCollector       errorCollector;
 
     @Override
     public String editEmployeeProfile(EditEmployeeProfileDTO editEmployeeProfileDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         String searchedEmployeePersonalNumber = editEmployeeProfileDTO.getPersonalNumber();
         Employee employee = getEmployeeByPersonalNumber(searchedEmployeePersonalNumber);
 
         validateEditEmployee(editEmployeeProfileDTO, employee);
 
-        if (errorCollectorService.getErrorOccurred()) {
-            errorCollectorService.callException(ExceptionType.GET_ENTITY_EXCEPTION);
+        if (errorCollector.getErrorOccurred()) {
+            errorCollector.callException(ExceptionType.GET_ENTITY_EXCEPTION);
         }
 
         employeeRepository.save(employee);
@@ -109,18 +109,18 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
 
     private void validateNonEmptyFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
         checkAndSetNonEmptyField(editEmployeeProfileDTO.getNewPostalAddress(), employee::setPostalAddress);
-        checkAndSetNonEmptyField(editEmployeeProfileDTO.getNewPathPhoto(), employee::setPathPhoto);
+        checkAndSetNonEmptyField(editEmployeeProfileDTO.getNewPathPhoto(),     employee::setPathPhoto);
     }
 
     private void validateEnumFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
         checkAndSetEnumField(editEmployeeProfileDTO.getNewFamilyStatus(), employee::setFamilyStatus, FamilyStatus.class);
-        checkAndSetEnumField(editEmployeeProfileDTO.getNewStatus(), employee::setStatus, Status.class);
+        checkAndSetEnumField(editEmployeeProfileDTO.getNewStatus(),       employee::setStatus, Status.class);
     }
 
     private void validateDateFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
-        checkAndSetDate(editEmployeeProfileDTO.getNewBirthDate(), employee::setBirthDate);
+        checkAndSetDate(editEmployeeProfileDTO.getNewBirthDate(),      employee::setBirthDate);
         checkAndSetDate(editEmployeeProfileDTO.getNewEmploymentDate(), employee::setEmploymentDate);
-        checkAndSetDate(editEmployeeProfileDTO.getNewDismissalDate(), employee::setDismissalDate);
+        checkAndSetDate(editEmployeeProfileDTO.getNewDismissalDate(),  employee::setDismissalDate);
     }
 
     private void checkAndSetFullName(String newFirstname, String newLastname, String newPatronimyc, Employee employee) {
@@ -147,7 +147,7 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
             if (uniquenessChecker.apply(newValue)) {
                 fieldSetter.accept(newValue);
             } else {
-                errorCollectorService.addErrorMessages(List.of(errorDescription));
+                errorCollector.addErrorMessages(List.of(errorDescription));
             }
         }
     }
@@ -162,7 +162,7 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         if (!newValue.isBlank()) {
             T enumValue = commonRepositoryUtil.getEnumByStringName(enumType, newValue);
             if (enumValue == null) {
-                errorCollectorService.addErrorMessages(List.of());
+                errorCollector.addErrorMessages(List.of(ErrorDescription.ENUM_TYPE_NOT_FOUND));
             } else {
                 fieldSetter.accept(enumValue);
             }
@@ -170,7 +170,7 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
     }
 
     private void checkAndSetDate(String newDate, Consumer<LocalDate> dateSetter) {
-        if (!newDate.isBlank()) {
+        if (newDate != null && !newDate.isBlank()) {
             LocalDate parseDate = employeeDateUtil.parseOrNull(newDate);
             dateSetter.accept(parseDate);
         }
@@ -180,8 +180,8 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         Optional<Employee> employee = employeeRepository.findByPersonalNumber(personalNumber);
 
         if (employee.isEmpty()) {
-            errorCollectorService.addErrorMessages(List.of(ErrorDescription.PERSONAL_NUMBER_NON_EXISTENT));
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+            errorCollector.addErrorMessages(List.of(ErrorDescription.PERSONAL_NUMBER_NON_EXISTENT));
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         return employee.orElse(null);
@@ -197,21 +197,23 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
 
     @Override
     public String editEmployeePosition(EditEmployeePositionDTO editEmployeePositionDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         String searchedPersonalNumber = editEmployeePositionDTO.getPersonalNumber();
         Employee employee = getEmployeeByPersonalNumber(searchedPersonalNumber);
 
-        if (editEmployeePositionDTO.isAddedOperation()) {
+        System.out.println(editEmployeePositionDTO);
+
+        if (editEmployeePositionDTO.getIsAddedOperation()) {
             addedPositionOperation(employee, editEmployeePositionDTO);
-        } else if (editEmployeePositionDTO.isRemoveOperation()) {
+        } else if (editEmployeePositionDTO.getIsRemoveOperation()) {
             removePositionOperation(employee, editEmployeePositionDTO);
         } else {
-            errorCollectorService.addErrorMessages(List.of(ErrorDescription.SELECT_OPERATION));
+            errorCollector.addErrorMessages(List.of(ErrorDescription.SELECT_OPERATION));
         }
 
-        if (errorCollectorService.getErrorOccurred()) {
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+        if (errorCollector.getErrorOccurred()) {
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         return getSuccessMessage(searchedPersonalNumber);
@@ -238,29 +240,30 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         );
 
         if (optionalEmployeePosition.isEmpty()) {
-            errorCollectorService.addErrorMessages(List.of(ErrorDescription.INVALID_THIS_POSITION));
+            errorCollector.addErrorMessages(List.of(ErrorDescription.INVALID_THIS_POSITION));
         } else {
             optionalEmployeePosition.get().setEndDate(employeeDateUtil.parseOrNow(editEmployeePositionDTO.getEndDate()));
+            employeePositionRepository.save(optionalEmployeePosition.get());
         }
     }
 
     @Override
     public String editEmployeeStructure(EditEmployeeStructureDTO editEmployeeStructureDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         String searchedPersonalNumber = editEmployeeStructureDTO.getPersonalNumber();
         Employee employee = getEmployeeByPersonalNumber(searchedPersonalNumber);
 
-        if (editEmployeeStructureDTO.isAddedOperation()) {
+        if (editEmployeeStructureDTO.getIsAddedOperation()) {
             addedStructureOperation(employee, editEmployeeStructureDTO);
-        } else if (editEmployeeStructureDTO.isRemoveOperation()) {
+        } else if (editEmployeeStructureDTO.getIsRemoveOperation()) {
             removeStructureOperation(employee, editEmployeeStructureDTO);
         } else {
-            errorCollectorService.addErrorMessages(List.of(ErrorDescription.SELECT_OPERATION));
+            errorCollector.addErrorMessages(List.of(ErrorDescription.SELECT_OPERATION));
         }
 
-        if (errorCollectorService.getErrorOccurred()) {
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+        if (errorCollector.getErrorOccurred()) {
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         return getSuccessMessage(searchedPersonalNumber);
@@ -286,7 +289,7 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
             editEmployeeStructureDTO.getStructureId()
         );
         if (optionalEmployeeStructure.isEmpty()) {
-            errorCollectorService.addErrorMessages(List.of(ErrorDescription.INVALID_THIS_STRUCTURE));
+            errorCollector.addErrorMessages(List.of(ErrorDescription.INVALID_THIS_STRUCTURE));
         } else {
             optionalEmployeeStructure.get().setEndDate(employeeDateUtil.parseOrNow(editEmployeeStructureDTO.getEndDate()));
         }

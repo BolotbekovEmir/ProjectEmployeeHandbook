@@ -70,18 +70,18 @@ public class Employee {
         LocalDate employmentDate,
         LocalDate dismissalDate
     ) {
-        this.firstname = createEmployeeDTO.getFirstname();
-        this.lastname = createEmployeeDTO.getLastname();
-        this.patronimyc = createEmployeeDTO.getPatronimyc();
+        this.firstname      = createEmployeeDTO.getFirstname();
+        this.lastname       = createEmployeeDTO.getLastname();
+        this.patronimyc     = createEmployeeDTO.getPatronimyc();
         this.personalNumber = createEmployeeDTO.getPersonalNumber();
-        this.phone = createEmployeeDTO.getPhone();
-        this.email = createEmployeeDTO.getEmail();
-        this.pathPhoto = createEmployeeDTO.getPathPhoto();
-        this.postalAddress = createEmployeeDTO.getPostalAddress();
-        this.familyStatus = familyStatus;
-        this.status = status;
-        this.birthDate = birthDate;
+        this.phone          = createEmployeeDTO.getPhone();
+        this.email          = createEmployeeDTO.getEmail();
+        this.pathPhoto      = createEmployeeDTO.getPathPhoto();
+        this.postalAddress  = createEmployeeDTO.getPostalAddress();
+        this.familyStatus   = familyStatus;
+        this.status         = status;
+        this.birthDate      = birthDate;
         this.employmentDate = employmentDate;
-        this.dismissalDate = dismissalDate;
+        this.dismissalDate  = dismissalDate;
     }
 }

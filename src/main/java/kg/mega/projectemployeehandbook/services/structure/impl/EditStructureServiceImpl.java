@@ -8,7 +8,7 @@ import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structure.EditStructureService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -28,15 +28,17 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditStructureServiceImpl implements EditStructureService {
     StructureTypeRepository structureTypeRepository;
-    ErrorCollectorService   errorCollectorService;
-    CommonRepositoryUtil    commonRepositoryUtil;
     StructureRepository     structureRepository;
-    LoggingService          loggingService;
+
+    LoggingService loggingService;
+
+    CommonRepositoryUtil commonRepositoryUtil;
+    ErrorCollector       errorCollector;
 
     @Override
     @Transactional
     public String editStructure(EditStructureDTO editStructureDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         Structure structure = commonRepositoryUtil.getEntityById(
             editStructureDTO.getStructureId(),
@@ -45,12 +47,12 @@ public class EditStructureServiceImpl implements EditStructureService {
         );
 
         if (!validateEditStructure(editStructureDTO, structure)) {
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         structureRepository.save(structure);
 
-        String operationSuccessMessage = format(InfoDescription.EDIT_STRUCTURE_FORMAT, 0);
+        String operationSuccessMessage = format(InfoDescription.EDIT_STRUCTURE_FORMAT, structure.getId());
         loggingService.logInfo(operationSuccessMessage);
         return operationSuccessMessage;
     }
@@ -76,7 +78,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         );
 
         if (Objects.equals(structure.getMaster(), masterStructure)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.STRUCTURE_ALREADY_THIS_MASTER)
             );
             return false;
@@ -98,7 +100,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         );
 
         if (Objects.equals(structure.getStructureType(), structureType)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.STRUCTURE_ALREADY_THIS_STRUCTURE_TYPE)
             );
             return false;
@@ -114,7 +116,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         }
 
         if (newStructureName.equals(structure.getStructureName())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.STRUCTURE_NAME_ALREADY_HAVE_THIS_NAME)
             );
             return false;
@@ -127,7 +129,7 @@ public class EditStructureServiceImpl implements EditStructureService {
     private boolean checkAndSetNewStructureActive(boolean disable, boolean enable, Structure structure) {
         if (disable) {
             if (!structure.getActive()) {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(ErrorDescription.STRUCTURE_ALREADY_INACTIVE)
                 );
                 return false;
@@ -138,7 +140,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         }
         if (enable) {
             if (structure.getActive()) {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(ErrorDescription.STRUCTURE_ALREADY_ACTIVE)
                 );
                 return false;

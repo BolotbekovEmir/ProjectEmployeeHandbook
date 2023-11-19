@@ -41,7 +41,6 @@ public class SearchPositionServiceImpl implements SearchPositionService {
                     );
                 }
             }
-            )
-            .collect(Collectors.toSet());
+            ).collect(Collectors.toSet());
     }
 }

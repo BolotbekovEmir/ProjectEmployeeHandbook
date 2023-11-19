@@ -49,7 +49,6 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
             employeesByEmail          = employeeRepository.findAllByEmail                           (searchField),
             employeesByPostalAddress  = employeeRepository.findAllByPostalAddressContainsIgnoreCase (searchField);
 
-
         Set<Employee> employeesByStatus = employeeRepository.findAllByStatus(
             commonRepositoryUtil.getEnumByStringName(Status.class, searchField)
         );
@@ -88,17 +87,22 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
         resultEmployeesSearch.addAll(employeesByStructure);
         resultEmployeesSearch.addAll(employeesByPosition);
 
-        return mapper(resultEmployeesSearch);
+        return mapper(resultEmployeesSearch.stream()
+            .filter(employee -> employee.getDismissalDate() == null)
+            .collect(Collectors.toSet()));
     }
 
     private Set<GetEmployeeDTO> mapper(Set<Employee> employees) {
         return employees.stream()
+            // Создание DTO для каждого сотрудника на основе его данных
             .map(employee -> new GetEmployeeDTO(
+                // ФИО сотрудника
                 employee.getLastname()
                     .concat(" ")
                     .concat(employee.getFirstname())
                     .concat(" ")
                     .concat(employee.getPatronimyc()),
+                // Другие данные сотрудника: персональный номер, телефон, email, почтовый адрес, фото и т.д.
                 employee.getPersonalNumber(),
                 employee.getPhone(),
                 employee.getEmail(),
@@ -106,30 +110,30 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
                 employee.getPathPhoto(),
                 employee.getFamilyStatus(),
                 employee.getStatus(),
-                employeePositionRepository.findAllByEmployee(employee).stream()
+                // Получение должностей текущего сотрудника
+                employeePositionRepository.findAllByEmployeeAndEndDateIsNull(employee).stream()
                     .map(employeePosition ->
+                        // Создание DTO для каждой должности сотрудника
                         employeePosition.getPosition().getMaster() == null
+                            // Если должность не подчиненная, создаем DTO только с id, названием и статусом должности
                             ? new GetPositionDTO(
                             employeePosition.getPosition().getId(),
                             null,
                             employeePosition.getPosition().getPositionName(),
                             employeePosition.getPosition().getActive())
+                            // Если должность подчиненная, создаем DTO с id, id руководителя, названием и статусом должности
                             : new GetPositionDTO(
                             employeePosition.getPosition().getId(),
                             employeePosition.getPosition().getMaster().getId(),
                             employeePosition.getPosition().getPositionName(),
                             employeePosition.getPosition().getActive())
-                    ).collect(Collectors.toSet()),
-                searchStructureService.searchStructure(
-                    employeeStructureRepository.findAllByEmployee(employee).stream()
-                        .map(employeeStructure -> employeeStructure.getStructure()
-                            .getId()
-                            .toString())
-                        .findAny()
-                        .orElse(null)),
+                    ).collect(Collectors.toSet()), // Собираем DTO должностей в Set
+                // Получение информации о структурах, в которых работает сотрудник
+                searchStructureService.searchEmployeeStructures(employee.getId()),
+                // Дата трудоустройства и дата рождения сотрудника
                 employee.getEmploymentDate(),
                 employee.getBirthDate()
             ))
-            .collect(Collectors.toSet());
+            .collect(Collectors.toSet()); // Собираем DTO сотрудников в Set
     }
 }

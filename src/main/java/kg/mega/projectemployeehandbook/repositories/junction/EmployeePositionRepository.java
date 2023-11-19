@@ -12,6 +12,6 @@ import java.util.Set;
 @Repository
 public interface EmployeePositionRepository extends JpaRepository<EmployeePosition, Long> {
     Set<EmployeePosition> findAllByPosition(Position position);
-    Set<EmployeePosition> findAllByEmployee(Employee employee);
+    Set<EmployeePosition> findAllByEmployeeAndEndDateIsNull(Employee employee);
     Optional<EmployeePosition> findByEmployee_PersonalNumberAndPositionId(String personalNumber, Long positionId);
 }

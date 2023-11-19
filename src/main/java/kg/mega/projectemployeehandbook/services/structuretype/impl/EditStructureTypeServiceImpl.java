@@ -6,7 +6,7 @@ import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.EditStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structuretype.EditStructureTypeService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -24,14 +24,17 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     StructureTypeRepository structureTypeRepository;
-    ErrorCollectorService   errorCollectorService;
-    CommonRepositoryUtil    commonRepositoryUtil;
-    LoggingService          loggingService;
+
+    LoggingService loggingService;
+
+    CommonRepositoryUtil commonRepositoryUtil;
+    ErrorCollector       errorCollector;
+
 
     @Override
     @Transactional
     public String editStructureType(EditStructureTypeDTO editStructureTypeDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         StructureType structureType = commonRepositoryUtil.getEntityById(
             editStructureTypeDTO.getStructureTypeId(),
@@ -40,12 +43,12 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         );
 
         if (!validateEditStructureType(editStructureTypeDTO, structureType)) {
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         structureTypeRepository.save(structureType);
 
-        String operationSuccessMessage = format(InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, structureType.getStructureTypeName());
+        String operationSuccessMessage = format(InfoDescription.EDIT_STRUCTURE_TYPE_FORMAT, structureType.getId());
         loggingService.logInfo(operationSuccessMessage);
         return operationSuccessMessage;
     }
@@ -53,7 +56,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     private boolean validateEditStructureType(EditStructureTypeDTO editStructureTypeDTO, StructureType structureType) {
         boolean valid = true;
         valid &= checkAndSetNewStructureTypeName(editStructureTypeDTO.getNewStructureTypeName(), structureType);
-        valid &= checkAndSetStructureTypeActive(editStructureTypeDTO.isDisable(), editStructureTypeDTO.isEnable(), structureType);
+        valid &= checkAndSetStructureTypeActive(editStructureTypeDTO.getDisable(), editStructureTypeDTO.getEnable(), structureType);
         return valid;
     }
 
@@ -62,7 +65,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
             return true;
         }
         if (newStructureTypeName.equals(structureType.getStructureTypeName())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.STRUCTURE_TYPE_NAME_ALREADY_USED)
             );
             return false;
@@ -74,7 +77,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     private boolean checkAndSetStructureTypeActive(boolean disable, boolean enable, StructureType structureType) {
         if (disable) {
             if (!structureType.getActive()) {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(ErrorDescription.STRUCTURE_TYPE_ALREADY_INACTIVE)
                 );
                 return false;
@@ -84,7 +87,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         }
         if (enable) {
             if (structureType.getActive()) {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(ErrorDescription.STRUCTURE_TYPE_ALREADY_ACTIVE)
                 );
                 return false;

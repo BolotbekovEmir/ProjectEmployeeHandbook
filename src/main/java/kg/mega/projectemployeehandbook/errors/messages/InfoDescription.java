@@ -11,7 +11,7 @@ public class InfoDescription {
 
         /* Сообщения тип структур */
 
-        CREATE_STRUCTURE_TYPE_FORMAT = "Создан тип структуры с ID '%s'",
+        CREATE_STRUCTURE_TYPE_FORMAT = "Создан тип структуры с ID '%d'",
         EDIT_STRUCTURE_TYPE_FORMAT = "Изменен тип структуры с ID '%d'",
 
         /* Сообщения структур */

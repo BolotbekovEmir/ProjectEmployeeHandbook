@@ -1,7 +1,7 @@
 package kg.mega.projectemployeehandbook.utils;
 
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
@@ -16,9 +16,9 @@ import static lombok.AccessLevel.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EmployeeDateUtil {
-    ErrorCollectorService errorCollectorService;
+    ErrorCollector errorCollector;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public LocalDate parseOrNull(String date) {
         return date.isBlank()
@@ -34,7 +34,7 @@ public class EmployeeDateUtil {
 
     public void validateDatePair(String startDate, String endDate) {
         if (!endDate.isBlank() && startDate.isBlank()) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 List.of(
                     String.format(ErrorDescription.END_DATE_IS_PRESENT_BUT_START_DATE_IS_NULL_FORMAT, endDate)
                 )

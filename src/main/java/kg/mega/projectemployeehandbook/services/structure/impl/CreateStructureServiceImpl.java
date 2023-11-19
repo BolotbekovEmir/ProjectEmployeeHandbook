@@ -7,7 +7,7 @@ import kg.mega.projectemployeehandbook.models.entities.Structure;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structure.CreateStructureService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -23,14 +23,16 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateStructureServiceImpl implements CreateStructureService {
     StructureTypeRepository structureTypeRepository;
-    ErrorCollectorService   errorCollectorService;
-    CommonRepositoryUtil    commonRepositoryUtil;
     StructureRepository     structureRepository;
-    LoggingService          loggingService;
+
+    LoggingService loggingService;
+
+    CommonRepositoryUtil commonRepositoryUtil;
+    ErrorCollector       errorCollector;
 
     @Override
     public String createStructure(CreateStructureDTO createStructureDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         Structure structureMaster = commonRepositoryUtil.getEntityById(
             createStructureDTO.getMasterId(),

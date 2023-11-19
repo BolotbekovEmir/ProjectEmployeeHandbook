@@ -16,8 +16,7 @@ public class ChangeAdminPasswordDTO {
     @Pattern(
         regexp = PASSWORD_PATTERN,
         message = ErrorDescription.PASSWORD_PATTERN
-    )
-    String newAdminPassword;
+    ) String newAdminPassword;
 
     String confirmNewAdminPassword;
 

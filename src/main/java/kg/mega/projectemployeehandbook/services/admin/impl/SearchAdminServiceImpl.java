@@ -23,7 +23,8 @@ import static lombok.AccessLevel.*;
 public class SearchAdminServiceImpl implements SearchAdminService {
     CommonRepositoryUtil commonRepositoryUtil;
     AdminRepository      adminRepository;
-    MapperConfiguration  mapper;
+
+    MapperConfiguration mapper;
 
     @Override
     public Set<GetAdminDTO> searchAdmins(String searchField) {

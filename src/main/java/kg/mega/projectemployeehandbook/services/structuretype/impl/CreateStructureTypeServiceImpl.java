@@ -7,7 +7,7 @@ import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.CreateStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structuretype.CreateStructureTypeService;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +23,21 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateStructureTypeServiceImpl implements CreateStructureTypeService {
     StructureTypeRepository structureTypeRepository;
-    ErrorCollectorService   errorCollectorService;
-    LoggingService          loggingService;
-    MapperConfiguration     mapper;
+
+    LoggingService loggingService;
+
+    MapperConfiguration mapper;
+    ErrorCollector      errorCollector;
 
     @Override
     public String createStructureType(CreateStructureTypeDTO createStructureTypeDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         if (!validateStructureTypeName(createStructureTypeDTO.getStructureTypeName())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.STRUCTURE_TYPE_NAME_IS_EMPTY)
             );
-            errorCollectorService.callException(ExceptionType.CREATE_ENTITY_EXCEPTION);
+            errorCollector.callException(ExceptionType.CREATE_ENTITY_EXCEPTION);
         }
 
         StructureType structureType = mapper.getMapper().map(createStructureTypeDTO, StructureType.class);
@@ -43,7 +45,7 @@ public class CreateStructureTypeServiceImpl implements CreateStructureTypeServic
         structureTypeRepository.save(structureType);
 
         String operationSuccessMessage = format(
-            InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, createStructureTypeDTO.getStructureTypeName()
+            InfoDescription.CREATE_STRUCTURE_TYPE_FORMAT, structureType.getId()
         );
         loggingService.logInfo(operationSuccessMessage);
         return operationSuccessMessage;

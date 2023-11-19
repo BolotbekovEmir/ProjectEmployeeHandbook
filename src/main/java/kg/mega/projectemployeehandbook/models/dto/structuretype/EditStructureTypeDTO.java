@@ -13,7 +13,7 @@ public class EditStructureTypeDTO {
 
     String newStructureTypeName;
 
-    boolean
+    Boolean
         disable,
         enable;
 

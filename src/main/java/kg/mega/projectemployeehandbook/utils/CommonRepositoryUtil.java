@@ -2,7 +2,7 @@ package kg.mega.projectemployeehandbook.utils;
 
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.repository.CrudRepository;
@@ -20,7 +20,7 @@ import static lombok.AccessLevel.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CommonRepositoryUtil {
-    ErrorCollectorService errorCollectorService;
+    ErrorCollector errorCollector;
 
     /**
      * Получает сущность из указанного CrudRepository по её идентификатору.
@@ -37,19 +37,19 @@ public class CommonRepositoryUtil {
         String errorMessage
     ) {
         if (entityId == null) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.ENTITY_ID_IS_NULL)
             );
-            errorCollectorService.callException(ExceptionType.GET_ENTITY_EXCEPTION);
+            errorCollector.callException(ExceptionType.GET_ENTITY_EXCEPTION);
             return null;
         }
 
         return repository.findById(entityId)
             .orElseThrow(() -> {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(errorMessage)
                 );
-                errorCollectorService.callException(ExceptionType.GET_ENTITY_EXCEPTION);
+                errorCollector.callException(ExceptionType.GET_ENTITY_EXCEPTION);
                 return null;
             });
     }

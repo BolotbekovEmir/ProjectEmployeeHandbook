@@ -6,7 +6,7 @@ import kg.mega.projectemployeehandbook.models.dto.position.EditPositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.position.EditPositionService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -25,15 +25,17 @@ import static lombok.AccessLevel.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditPositionServiceImpl implements EditPositionService {
-    ErrorCollectorService errorCollectorService;
-    CommonRepositoryUtil  commonRepositoryUtil;
-    PositionRepository    positionRepository;
-    LoggingService        loggingService;
+    PositionRepository positionRepository;
+
+    LoggingService loggingService;
+
+    CommonRepositoryUtil commonRepositoryUtil;
+    ErrorCollector       errorCollector;
 
     @Override
     @Transactional
     public String editPosition(EditPositionDTO editPositionDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         Position position = commonRepositoryUtil.getEntityById(
             editPositionDTO.getEditedPositionId(),
@@ -42,7 +44,7 @@ public class EditPositionServiceImpl implements EditPositionService {
         );
 
         if (!validateEditPosition(editPositionDTO, position)) {
-            errorCollectorService.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
         positionRepository.save(position);
@@ -72,7 +74,7 @@ public class EditPositionServiceImpl implements EditPositionService {
         );
 
         if (Objects.equals(position.getMaster(), masterPosition)) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.POSITION_ALREADY_THIS_MASTER)
             );
             return false;
@@ -88,7 +90,7 @@ public class EditPositionServiceImpl implements EditPositionService {
         }
 
         if (newPositionName.equals(position.getPositionName())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 of(ErrorDescription.POSITION_ALREADY_THIS_NAME)
             );
             return false;
@@ -101,7 +103,7 @@ public class EditPositionServiceImpl implements EditPositionService {
     private boolean checkAndSetNewPositionActive(boolean disable, boolean enable, Position position) {
         if (disable) {
             if (!position.getActive()) {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(ErrorDescription.POSITION_ALREADY_INACTIVE)
                 );
                 return false;
@@ -112,7 +114,7 @@ public class EditPositionServiceImpl implements EditPositionService {
         }
         if (enable) {
             if (position.getActive()) {
-                errorCollectorService.addErrorMessages(
+                errorCollector.addErrorMessages(
                     of(ErrorDescription.POSITION_ALREADY_ACTIVE)
                 );
                 return false;

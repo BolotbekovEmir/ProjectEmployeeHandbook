@@ -16,7 +16,7 @@ import kg.mega.projectemployeehandbook.repositories.PositionRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeePositionRepository;
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeeStructureRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollectorService;
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.employee.CreateEmployeeService;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
@@ -37,22 +37,22 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     EmployeeStructureRepository employeeStructureRepository;
-    EmployeePositionRepository employeePositionRepository;
-    StructureRepository structureRepository;
-    PositionRepository positionRepository;
-    EmployeeRepository employeeRepository;
+    EmployeePositionRepository  employeePositionRepository;
+    StructureRepository         structureRepository;
+    PositionRepository          positionRepository;
+    EmployeeRepository          employeeRepository;
 
     ValidationUniqueService validationUniqueService;
-    ErrorCollectorService errorCollectorService;
-    LoggingService loggingService;
+    LoggingService          loggingService;
 
     CommonRepositoryUtil commonRepositoryUtil;
-    EmployeeDateUtil employeeDateUtil;
+    EmployeeDateUtil     employeeDateUtil;
+    ErrorCollector       errorCollector;
 
     @Override
     @Transactional
     public String createEmployee(CreateEmployeeDTO createEmployeeDTO) {
-        errorCollectorService.cleanup();
+        errorCollector.cleanup();
 
         validateEmployeeData(createEmployeeDTO);
         validateUniqueEmployeeData(createEmployeeDTO);
@@ -61,8 +61,8 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         employeeDateUtil.validateDatePair(createEmployeeDTO.getPositionStartDate(), createEmployeeDTO.getPositionEndDate());
         employeeDateUtil.validateDatePair(createEmployeeDTO.getStatusStartDate(), createEmployeeDTO.getStatusEndDate());
 
-        if (errorCollectorService.getErrorOccurred()) {
-            errorCollectorService.callException(
+        if (errorCollector.getErrorOccurred()) {
+            errorCollector.callException(
                 ExceptionType.CREATE_ENTITY_EXCEPTION
             );
         }
@@ -143,7 +143,7 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
 
     private void validateEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
         if (createEmployeeDTO.getPathPhoto().isBlank()) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 List.of(ErrorDescription.PHOTO_NULL)
             );
         }
@@ -154,17 +154,17 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
 
     private void validateUniqueEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
         if (!validationUniqueService.isUniqueEmployeePersonalNumber(createEmployeeDTO.getPersonalNumber())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 List.of(ErrorDescription.PERSONAL_NUMBER_UNIQUE)
             );
         }
         if (!validationUniqueService.isUniquePhone(createEmployeeDTO.getPhone())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 List.of(ErrorDescription.PHONE_UNIQUE)
             );
         }
         if (!validationUniqueService.isUniqueEmail(createEmployeeDTO.getEmail())) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 List.of(ErrorDescription.EMAIL_UNIQUE)
             );
         }
@@ -174,7 +174,7 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         E enumObject = commonRepositoryUtil.getEnumByStringName(enumCLass, enumName);
 
         if (enumObject == null) {
-            errorCollectorService.addErrorMessages(
+            errorCollector.addErrorMessages(
                 List.of(errorMessage)
             );
         }

@@ -15,6 +15,7 @@ public class ErrorDescription {
         PASSWORDS_EQUAL = "Пароли не совпадают",
         THIS_ADMIN_PERSONAL_NUMBER_ALREADY_USED = "У администратора уже установлен данный персональный номер",
         THIS_PASSWORD_ALREADY_USED = "Пароль не должен соответствовать старому",
+        ADMIN_HAS_NOT_AUTHENTICATED = "Администратор не аутентифицирован",
 
         /* Сообщения регулярных выражений (паттернов) */
 
@@ -39,6 +40,8 @@ public class ErrorDescription {
         SELECT_OPERATION = "Необходимо выбрать одну из операций",
         INVALID_THIS_POSITION = "За сотрудником не закреплено данной позиции",
         INVALID_THIS_STRUCTURE = "За сотрудником не закреплена данная организационная структура",
+        ENUM_TYPE_NOT_FOUND = "Неизвестный тип перечисления",
+        EMPLOYEE_ID_NOT_FOUND = "Сотрудник по данному ID не найден",
 
         /* Сообщения типа структур */
 
@@ -69,10 +72,10 @@ public class ErrorDescription {
 
         /* Сообщения исключений */
 
-        ENTITY_NOT_FOUND = "Не удалось произвести операцию получения сущностей",
+        ENTITY_NOT_FOUND = "Не удалось произвести операцию получения",
         CREATE_ENTITY_ERROR = "Не удалось произвести операцию создания",
         EDIT_ENTITY_ERROR = "Не удалось произвести операцию редактирования",
         ENTITY_ID_IS_NULL = "ID не может быть пустым",
         UNKNOWN_EXCEPTION_NAME_FORMAT = "Передано необрабатываемое исключение: %s",
-        DETECTED_ERROR_FORMAT = "Обнаружена ошибка. Текущий стек: {%s}";
+        DETECTED_ERROR_FORMAT = "Обнаружена ошибка. Текущий стек: %s";
 }

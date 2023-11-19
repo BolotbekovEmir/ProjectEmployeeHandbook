@@ -8,26 +8,26 @@ import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static kg.mega.projectemployeehandbook.errors.messages.ErrorDescription.UNKNOWN_EXCEPTION_NAME_FORMAT;
-import static lombok.AccessLevel.*;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
- * Сервис для сбора и управления ошибками в приложении.
+ * Компонент для сбора и управления ошибками в приложении.
 
- * Этот сервис позволяет собирать ошибки и выбрасывать пользовательские исключения на основе типа ошибки.
+ * Этот коллектор позволяет собирать ошибки и выбрасывать пользовательские исключения на основе типа ошибки.
  * Он также поддерживает логгирование ошибок и информационных сообщений.
  *
  */
-@Service
+@Component
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE)
-public class ErrorCollectorService {
+public class ErrorCollector {
     /**
      * Сервис логгирования для записи информационных и ошибочных сообщений.
      */
@@ -78,7 +78,9 @@ public class ErrorCollectorService {
     /**
      * Вызывает пользовательское исключение на основе указанного имени исключения.
      * Если имя исключения не соответствует ни одному из предопределенных типов, выбрасывается IllegalArgumentException.
-     *
+
+     * Поддерживает вызов только тех исключений, которые обрабатываются в глобальных хэндлерах.
+
      * @param exceptionName Имя исключения для выбрасывания.
      * @throws CreateEntityException Если exceptionName равен "CREATE_ENTITY_EXCEPTION".
      * @throws EditEntityException Если exceptionName равен "EDIT_ENTITY_EXCEPTION".
@@ -88,9 +90,9 @@ public class ErrorCollectorService {
     public void callException(final ExceptionType exceptionName) {
         String unknownExceptionMessage = format(UNKNOWN_EXCEPTION_NAME_FORMAT, exceptionName);
         switch (exceptionName) {
-            case CREATE_ENTITY_EXCEPTION -> throw new CreateEntityException(this.errorMessages);
-            case EDIT_ENTITY_EXCEPTION   -> throw new EditEntityException(this.errorMessages);
-            case GET_ENTITY_EXCEPTION    -> throw new GetEntityException(this.errorMessages);
+            case CREATE_ENTITY_EXCEPTION -> throw new CreateEntityException (this.errorMessages);
+            case EDIT_ENTITY_EXCEPTION   -> throw new EditEntityException   (this.errorMessages);
+            case GET_ENTITY_EXCEPTION    -> throw new GetEntityException    (this.errorMessages);
             default -> {
                 loggingService.logError(unknownExceptionMessage);
                 throw new IllegalArgumentException(unknownExceptionMessage);

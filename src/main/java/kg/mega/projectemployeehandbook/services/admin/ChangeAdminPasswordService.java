@@ -4,6 +4,5 @@ import kg.mega.projectemployeehandbook.models.dto.admin.ChangeAdminPasswordDTO;
 
 public interface ChangeAdminPasswordService {
 
-    String changeAdminPassword(ChangeAdminPasswordDTO changeAdminPasswordDTO);
-
+    String changePassword(ChangeAdminPasswordDTO changeAdminPasswordDTO);
 }
