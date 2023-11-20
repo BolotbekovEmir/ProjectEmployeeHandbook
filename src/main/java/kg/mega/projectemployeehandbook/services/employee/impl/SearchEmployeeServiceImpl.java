@@ -97,11 +97,17 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
             // Создание DTO для каждого сотрудника на основе его данных
             .map(employee -> new GetEmployeeDTO(
                 // ФИО сотрудника
-                employee.getLastname()
-                    .concat(" ")
-                    .concat(employee.getFirstname())
-                    .concat(" ")
-                    .concat(employee.getPatronimyc()),
+                employee.getPatronimyc() == null
+                    // При отсутствии отчества
+                    ? employee.getLastname()
+                        .concat(" ")
+                        .concat(employee.getFirstname())
+                    // При наличии отчества
+                    : employee.getLastname()
+                        .concat(" ")
+                        .concat(employee.getFirstname())
+                        .concat(" ")
+                        .concat(employee.getPatronimyc()),
                 // Другие данные сотрудника: персональный номер, телефон, email, почтовый адрес, фото и т.д.
                 employee.getPersonalNumber(),
                 employee.getPhone(),
@@ -115,25 +121,24 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
                     .map(employeePosition ->
                         // Создание DTO для каждой должности сотрудника
                         employeePosition.getPosition().getMaster() == null
-                            // Если должность не подчиненная, создаем DTO только с id, названием и статусом должности
+                            // Если должность не подчиненная, создается DTO только с id, названием и статусом должности
                             ? new GetPositionDTO(
-                            employeePosition.getPosition().getId(),
-                            null,
-                            employeePosition.getPosition().getPositionName(),
-                            employeePosition.getPosition().getActive())
-                            // Если должность подчиненная, создаем DTO с id, id руководителя, названием и статусом должности
+                                employeePosition.getPosition().getId(),
+                                null,
+                                employeePosition.getPosition().getPositionName(),
+                                employeePosition.getPosition().getActive())
+                            // Если должность подчиненная, создается DTO с id, id руководителя, названием и статусом должности
                             : new GetPositionDTO(
-                            employeePosition.getPosition().getId(),
-                            employeePosition.getPosition().getMaster().getId(),
-                            employeePosition.getPosition().getPositionName(),
-                            employeePosition.getPosition().getActive())
-                    ).collect(Collectors.toSet()), // Собираем DTO должностей в Set
+                                employeePosition.getPosition().getId(),
+                                employeePosition.getPosition().getMaster().getId(),
+                                employeePosition.getPosition().getPositionName(),
+                                employeePosition.getPosition().getActive())
+                    ).collect(Collectors.toSet()), // Собирается DTO должностей в Set
                 // Получение информации о структурах, в которых работает сотрудник
                 searchStructureService.searchEmployeeStructures(employee.getId()),
                 // Дата трудоустройства и дата рождения сотрудника
                 employee.getEmploymentDate(),
                 employee.getBirthDate()
-            ))
-            .collect(Collectors.toSet()); // Собираем DTO сотрудников в Set
+            )).collect(Collectors.toSet()); // Собирается DTO сотрудников в Set
     }
 }

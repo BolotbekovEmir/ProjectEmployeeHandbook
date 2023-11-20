@@ -11,6 +11,6 @@ public class CreateStructureTypeDTO {
 
     String structureTypeName;
 
-    boolean active;
+    Boolean active;
 
 }

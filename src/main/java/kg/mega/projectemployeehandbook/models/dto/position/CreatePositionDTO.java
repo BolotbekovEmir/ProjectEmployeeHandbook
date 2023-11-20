@@ -13,6 +13,6 @@ public class CreatePositionDTO {
 
     Long masterId;
 
-    boolean active;
+    Boolean active;
 
 }

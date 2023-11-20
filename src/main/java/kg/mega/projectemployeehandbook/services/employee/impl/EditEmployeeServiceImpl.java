@@ -68,11 +68,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         employeeRepository.save(employee);
         Long employeeId = employee.getId();
 
+        String successfulOperationMessage = String.format(InfoDescription.EDIT_EMPLOYEE_PROFILE_FORMAT, employee.getId());
         infoCollector.setChangerInfo();
         infoCollector.setEntityInfo(employeeId, employee.getPersonalNumber());
-        infoCollector.writeFullLog(getSuccessMessage(employeeId));
+        infoCollector.writeFullLog(successfulOperationMessage);
 
-        return getSuccessMessage(employeeId);
+        return successfulOperationMessage;
     }
 
     private void validateEditEmployee(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
@@ -270,12 +271,6 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         return employee.orElse(null);
     }
 
-    private String getSuccessMessage(Long id) {
-        return String.format(
-            InfoDescription.EDIT_EMPLOYEE_PROFILE_FORMAT, id
-        );
-    }
-
     @Override
     public String editEmployeePosition(EditEmployeePositionDTO editEmployeePositionDTO) {
         errorCollector.cleanup();
@@ -284,9 +279,9 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         String searchedPersonalNumber = editEmployeePositionDTO.getPersonalNumber();
         Employee employee = getEmployeeByPersonalNumber(searchedPersonalNumber);
 
-        if (editEmployeePositionDTO.getIsAddedOperation()) {
+        if (editEmployeePositionDTO.getIsAddedOperation() && !editEmployeePositionDTO.getIsRemoveOperation()) {
             addedPositionOperation(employee, editEmployeePositionDTO);
-        } else if (editEmployeePositionDTO.getIsRemoveOperation()) {
+        } else if (editEmployeePositionDTO.getIsRemoveOperation() && !editEmployeePositionDTO.getIsAddedOperation()) {
             removePositionOperation(employee, editEmployeePositionDTO);
         } else {
             errorCollector.addErrorMessages(List.of(ErrorDescription.SELECT_OPERATION));
@@ -296,10 +291,11 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
             errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
+        String successfulOperationMessage = String.format(InfoDescription.EDIT_EMPLOYEE_PROFILE_FORMAT, employee.getId());
         infoCollector.setChangerInfo();
-        infoCollector.writeEntityLog(getSuccessMessage(employee.getId()));
+        infoCollector.writeEntityLog(successfulOperationMessage);
 
-        return getSuccessMessage(employee.getId());
+        return successfulOperationMessage;
     }
 
     private void addedPositionOperation(Employee employee, EditEmployeePositionDTO editEmployeePositionDTO) {
@@ -307,10 +303,11 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         employeePosition.setEmployee(employee);
         employeePosition.setPosition(
             commonRepositoryUtil.getEntityById(
-            editEmployeePositionDTO.getPositionId(),
-            positionRepository,
-            ErrorDescription.POSITION_ID_NOT_FOUND
-        ));
+                editEmployeePositionDTO.getPositionId(),
+                positionRepository,
+                ErrorDescription.POSITION_ID_NOT_FOUND
+            )
+        );
         employeePosition.setStartDate(employeeDateUtil.parseOrNow(editEmployeePositionDTO.getStartDate()));
         employeePosition.setEndDate(employeeDateUtil.parseOrNull(editEmployeePositionDTO.getEndDate()));
 
@@ -338,18 +335,19 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
             EmployeePosition employeePosition = optionalEmployeePosition.get();
 
             infoCollector.setEntityInfo(
-                    employeePosition.getId(),
-                    String.format(
+                employeePosition.getId(),
+                String.format(
                     "employee id %d, position id %d",
                     employeePosition.getEmployee().getId(),
                     employeePosition.getPosition().getId()
-            ));
+                )
+            );
             infoCollector.addFieldUpdatesInfo(
-                    "endDate",
-                    employeePosition.getEndDate() != null
-                        ? employeePosition.getEndDate().toString()
-                        : "null",
-                    editEmployeePositionDTO.getEndDate()
+                "endDate",
+                employeePosition.getEndDate() != null
+                    ? employeePosition.getEndDate().toString()
+                    : "null",
+                editEmployeePositionDTO.getEndDate()
             );
 
             employeePosition.setEndDate(employeeDateUtil.parseOrNow(editEmployeePositionDTO.getEndDate()));
@@ -377,20 +375,23 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
             errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
 
+        String successfulOperationMessage = String.format(InfoDescription.EDIT_EMPLOYEE_PROFILE_FORMAT, employee.getId());
         infoCollector.setChangerInfo();
-        infoCollector.writeLog(getSuccessMessage(employee.getId()));
+        infoCollector.writeLog(successfulOperationMessage);
 
-        return getSuccessMessage(employee.getId());
+        return successfulOperationMessage;
     }
 
     private void addedStructureOperation(Employee employee, EditEmployeeStructureDTO editEmployeeStructureDTO) {
         EmployeeStructure employeeStructure = new EmployeeStructure();
         employeeStructure.setEmployee(employee);
-        employeeStructure.setStructure(commonRepositoryUtil.getEntityById(
-            editEmployeeStructureDTO.getStructureId(),
-            structureRepository,
-            ErrorDescription.STRUCTURE_ID_NOT_FOUND
-        ));
+        employeeStructure.setStructure(
+            commonRepositoryUtil.getEntityById(
+                editEmployeeStructureDTO.getStructureId(),
+                structureRepository,
+                ErrorDescription.STRUCTURE_ID_NOT_FOUND
+            )
+        );
         employeeStructure.setStartDate(employeeDateUtil.parseOrNow(editEmployeeStructureDTO.getStartDate()));
         employeeStructure.setEndDate(employeeDateUtil.parseOrNull(editEmployeeStructureDTO.getEndDate()));
 
@@ -416,18 +417,19 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         } else {
             EmployeeStructure employeeStructure = optionalEmployeeStructure.get();
             infoCollector.setEntityInfo(
-                    employeeStructure.getId(),
-                    String.format(
-                            "employee id %d, structure id %d",
-                            employeeStructure.getEmployee().getId(),
-                            employeeStructure.getStructure().getId()
-                    ));
+                employeeStructure.getId(),
+                String.format(
+                    "employee id %d, structure id %d",
+                    employeeStructure.getEmployee().getId(),
+                    employeeStructure.getStructure().getId()
+                )
+            );
             infoCollector.addFieldUpdatesInfo(
-                    "endDate",
-                    employeeStructure.getEndDate() != null
-                        ? employeeStructure.getEndDate().toString()
-                        : "null",
-                    editEmployeeStructureDTO.getEndDate()
+                "endDate",
+                employeeStructure.getEndDate() != null
+                    ? employeeStructure.getEndDate().toString()
+                    : "null",
+                editEmployeeStructureDTO.getEndDate()
             );
             employeeStructure.setEndDate(employeeDateUtil.parseOrNow(editEmployeeStructureDTO.getEndDate()));
             employeeStructureRepository.save(employeeStructure);

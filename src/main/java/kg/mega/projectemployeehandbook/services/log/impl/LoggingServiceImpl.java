@@ -8,11 +8,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class LoggingServiceImpl implements LoggingService {
     @Override
-    public void logInfo(String message) {
-        log.info(message);
-    }
-
-    @Override
     public void logError(String message) {
         log.error(message);
     }

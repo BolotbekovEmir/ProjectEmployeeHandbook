@@ -36,7 +36,6 @@ public class InfoCollector {
         this.fieldUpdates = new ArrayList<>();
     }
 
-    /* РЕСУРСОЗАТРАТНО */
     public void setChangerInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getPrincipal().toString();

@@ -79,7 +79,7 @@ public class EditAdminServiceImpl implements EditAdminService {
         valid &= checkAndSetNewAdminName(editAdminDTO.getNewAdminName(), admin);
         valid &= checkAndSetNewPersonalNumber(editAdminDTO.getNewPersonalNumber(), admin);
         valid &= checkAndSetNewPassword(editAdminDTO.getNewPassword(), editAdminDTO.getConfirmNewPassword(), admin);
-        valid &= checkAndSetAdminRole(editAdminDTO.isDisableAdmin(), editAdminDTO.isEnableAdmin(), admin.getAdminRole(), admin);
+        valid &= checkAndSetAdminRole(editAdminDTO.getDisableAdmin(), editAdminDTO.getEnableAdmin(), admin.getAdminRole(), admin);
         return valid;
     }
 

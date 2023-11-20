@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;

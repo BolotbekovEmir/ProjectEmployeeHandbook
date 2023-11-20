@@ -41,4 +41,8 @@ public class EmployeeDateUtil {
             );
         }
     }
+
+    public DateTimeFormatter getFormatter() {
+        return formatter;
+    }
 }

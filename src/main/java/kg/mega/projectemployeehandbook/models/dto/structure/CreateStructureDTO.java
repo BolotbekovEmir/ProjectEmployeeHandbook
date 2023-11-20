@@ -15,6 +15,6 @@ public class CreateStructureDTO {
         structureTypeId,
         masterId;
 
-    boolean active;
+    Boolean active;
 
 }

@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface AuthAdminService extends UserDetailsService {
-
     TokenAdminDTO authentication(AuthAdminDTO authDTO);
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
-
 }

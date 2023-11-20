@@ -15,7 +15,7 @@ public class EditPositionDTO {
 
     String newPositionName;
 
-    boolean
+    Boolean
         disable,
         enable;
 

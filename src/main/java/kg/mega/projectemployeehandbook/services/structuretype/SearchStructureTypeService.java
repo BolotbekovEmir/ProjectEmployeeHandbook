@@ -5,7 +5,5 @@ import kg.mega.projectemployeehandbook.models.dto.structuretype.GetStructureType
 import java.util.Set;
 
 public interface SearchStructureTypeService {
-
     Set<GetStructureTypeDTO> searchStructureType(String searchField);
-
 }

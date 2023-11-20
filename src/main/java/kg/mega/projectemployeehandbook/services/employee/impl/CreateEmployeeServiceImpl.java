@@ -1,5 +1,6 @@
 package kg.mega.projectemployeehandbook.services.employee.impl;
 
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.employee.CreateEmployeeDTO;
@@ -16,10 +17,8 @@ import kg.mega.projectemployeehandbook.repositories.PositionRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeePositionRepository;
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeeStructureRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.employee.CreateEmployeeService;
 import kg.mega.projectemployeehandbook.services.log.InfoCollector;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import kg.mega.projectemployeehandbook.utils.EmployeeDateUtil;
@@ -30,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static lombok.AccessLevel.PRIVATE;
 
 @Service
@@ -44,7 +43,6 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     EmployeeRepository          employeeRepository;
 
     ValidationUniqueService validationUniqueService;
-    LoggingService          loggingService;
 
     CommonRepositoryUtil commonRepositoryUtil;
     EmployeeDateUtil     employeeDateUtil;

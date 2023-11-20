@@ -1,5 +1,6 @@
 package kg.mega.projectemployeehandbook.services.structure.impl;
 
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structure.EditStructureDTO;
@@ -8,9 +9,7 @@ import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.log.InfoCollector;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structure.EditStructureService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 
 import static java.lang.String.format;
-import static java.util.List.*;
+import static java.util.List.of;
 import static lombok.AccessLevel.PRIVATE;
 
 @Service
@@ -30,8 +29,6 @@ import static lombok.AccessLevel.PRIVATE;
 public class EditStructureServiceImpl implements EditStructureService {
     StructureTypeRepository structureTypeRepository;
     StructureRepository     structureRepository;
-
-    LoggingService loggingService;
 
     CommonRepositoryUtil commonRepositoryUtil;
     ErrorCollector       errorCollector;
@@ -69,7 +66,7 @@ public class EditStructureServiceImpl implements EditStructureService {
         valid &= checkAndSetNewMaster(editStructureDTO.getNewMasterId(), structure);
         valid &= checkAndSetNewStructureType(editStructureDTO.getNewStructureTypeId(), structure);
         valid &= checkAndSetNewStructureName(editStructureDTO.getNewStructureName(), structure);
-        valid &= checkAndSetNewStructureActive(editStructureDTO.isDisable(), editStructureDTO.isEnable(), structure);
+        valid &= checkAndSetNewStructureActive(editStructureDTO.getDisable(), editStructureDTO.getEnable(), structure);
         return valid;
     }
 

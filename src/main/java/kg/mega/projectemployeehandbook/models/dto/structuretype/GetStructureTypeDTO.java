@@ -13,6 +13,6 @@ public class GetStructureTypeDTO {
 
     String structureTypeName;
 
-    boolean structureTypeActive;
+    Boolean structureTypeActive;
 
 }

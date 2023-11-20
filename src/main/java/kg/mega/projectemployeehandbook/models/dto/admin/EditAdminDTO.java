@@ -32,7 +32,7 @@ public class EditAdminDTO {
 
     String confirmNewPassword;
 
-    boolean
+    Boolean
         disableAdmin,
         enableAdmin;
 

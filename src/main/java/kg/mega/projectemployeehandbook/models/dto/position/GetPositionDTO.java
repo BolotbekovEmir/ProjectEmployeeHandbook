@@ -19,6 +19,6 @@ public class GetPositionDTO {
 
     String positionName;
 
-    boolean active;
+    Boolean active;
 
 }

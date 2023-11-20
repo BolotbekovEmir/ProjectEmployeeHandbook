@@ -50,7 +50,7 @@ public class CreateStructureServiceImpl implements CreateStructureService {
             structureMaster,
             structureType,
             createStructureDTO.getStructureName(),
-            createStructureDTO.isActive()
+            createStructureDTO.getActive()
         );
 
         structureRepository.save(structure);
