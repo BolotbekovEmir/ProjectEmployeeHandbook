@@ -18,6 +18,11 @@ import static java.lang.String.format;
 import static java.util.List.of;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Реализация сервиса для создания типов структур.
+ * Принимает данные и создает новый тип структуры, используя переданные параметры.
+ * Выполняет запись нового типа структуры в репозиторий.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -28,12 +33,18 @@ public class CreateStructureTypeServiceImpl implements CreateStructureTypeServic
     ErrorCollector      errorCollector;
     InfoCollector       infoCollector;
 
+    /**
+     * Создает новый тип структуры на основе переданных данных.
+     * @param createStructureTypeDTO Данные для создания типа структуры.
+     * @return Сообщение об успешном завершении операции создания типа структуры.
+     * @throws kg.mega.projectemployeehandbook.errors.exceptions.CreateEntityException Возникает при попытке создания типа структуры с пустым именем.
+     */
     @Override
     public String createStructureType(CreateStructureTypeDTO createStructureTypeDTO) {
         errorCollector.cleanup();
         infoCollector.cleanup();
 
-        if (!validateStructureTypeName(createStructureTypeDTO.getStructureTypeName())) {
+        if (createStructureTypeDTO.getStructureTypeName().isBlank()) {
             errorCollector.addErrorMessages(
                 of(ErrorDescription.STRUCTURE_TYPE_NAME_IS_EMPTY)
             );
@@ -54,9 +65,4 @@ public class CreateStructureTypeServiceImpl implements CreateStructureTypeServic
 
         return operationSuccessMessage;
     }
-
-    private boolean validateStructureTypeName(String structureTypeName) {
-        return !structureTypeName.isBlank();
-    }
-
 }

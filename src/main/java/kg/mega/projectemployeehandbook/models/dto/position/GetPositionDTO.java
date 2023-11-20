@@ -7,18 +7,24 @@ import lombok.experimental.FieldDefaults;
 
 import static lombok.AccessLevel.*;
 
+/**
+ * DTO для получения представления о позиции
+ * */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class GetPositionDTO {
+    /* ID позиции */
+    Long positionId;
 
-    Long
-        positionId,
-        masterId;
+    /* ID начальника-позиции */
+    Long masterId;
 
+    /* Имя позиции */
     String positionName;
 
+    /* Активность позиции */
     Boolean active;
 
 }

@@ -26,6 +26,9 @@ import static kg.mega.projectemployeehandbook.models.enums.AdminRole.ADMIN;
 import static kg.mega.projectemployeehandbook.models.enums.AdminRole.DISABLE;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для редактирования администратора.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -38,7 +41,12 @@ public class EditAdminServiceImpl implements EditAdminService {
     ErrorCollector  errorCollector;
     InfoCollector   infoCollector;
 
-
+    /**
+     * Метод для редактирования данных администратора.
+     *
+     * @param editAdminDTO объект, содержащий данные для редактирования администратора
+     * @return сообщение об успешном редактировании администратора
+     */
     @Override
     @Transactional
     public String editAdmin(EditAdminDTO editAdminDTO) {
@@ -63,6 +71,13 @@ public class EditAdminServiceImpl implements EditAdminService {
         return format(successfulMessage);
     }
 
+    /**
+     * Метод для получения информации об администраторе по имени.
+     *
+     * @param adminName имя администратора
+     * @return объект Admin, соответствующий переданному имени администратора
+     * @throws kg.mega.projectemployeehandbook.errors.exceptions.EditEntityException если администратор с переданным именем не найден
+     */
     private Admin getAdminFindByName(String adminName) {
         Optional<Admin> optionalAdmin = adminRepository.findByAdminName(adminName);
         if (optionalAdmin.isEmpty()) {
@@ -74,6 +89,13 @@ public class EditAdminServiceImpl implements EditAdminService {
         return optionalAdmin.orElseThrow();
     }
 
+    /**
+     * Проверяет данные для редактирования администратора.
+     *
+     * @param editAdminDTO объект, содержащий данные для редактирования администратора
+     * @param admin объект Admin, данные которого редактируются
+     * @return true, если данные для редактирования администратора допустимы, иначе false
+     */
     private boolean validateEditAdmin(EditAdminDTO editAdminDTO, Admin admin) {
         boolean valid = true;
         valid &= checkAndSetNewAdminName(editAdminDTO.getNewAdminName(), admin);
@@ -83,6 +105,13 @@ public class EditAdminServiceImpl implements EditAdminService {
         return valid;
     }
 
+    /**
+     * Проверяет и устанавливает новое имя администратора.
+     *
+     * @param newAdminName новое имя администратора
+     * @param admin объект Admin, для которого выполняется проверка и установка нового имени
+     * @return true, если новое имя установлено успешно, иначе false
+     */
     private boolean checkAndSetNewAdminName(String newAdminName, Admin admin) {
         if (newAdminName.isBlank()) {
             return true;
@@ -105,6 +134,13 @@ public class EditAdminServiceImpl implements EditAdminService {
         return true;
     }
 
+    /**
+     * Проверяет и устанавливает новый персональный номер администратора.
+     *
+     * @param newPersonalNumber новый персональный номер администратора
+     * @param admin объект Admin, для которого выполняется проверка и установка нового персонального номера
+     * @return true, если новый персональный номер установлен успешно, иначе false
+     */
     private boolean checkAndSetNewPersonalNumber(String newPersonalNumber, Admin admin) {
         if (newPersonalNumber.isBlank()) {
             return true;
@@ -126,6 +162,14 @@ public class EditAdminServiceImpl implements EditAdminService {
         return true;
     }
 
+    /**
+     * Проверяет и устанавливает новый пароль администратора.
+     *
+     * @param newPassword новый пароль администратора
+     * @param confirmNewPassword подтверждение нового пароля администратора
+     * @param admin объект Admin, для которого выполняется проверка и установка нового пароля
+     * @return true, если новый пароль установлен успешно, иначе false
+     */
     private boolean checkAndSetNewPassword(String newPassword, String confirmNewPassword, Admin admin) {
         if (newPassword.isBlank()) {
             return true;
@@ -147,6 +191,15 @@ public class EditAdminServiceImpl implements EditAdminService {
         return true;
     }
 
+    /**
+     * Проверяет и устанавливает новую роль администратора.
+     *
+     * @param disableAdmin флаг для отключения администратора
+     * @param enableAdmin флаг для включения администратора
+     * @param currentRole текущая роль администратора
+     * @param admin объект Admin, для которого выполняется проверка и установка новой роли
+     * @return true, если новая роль установлена успешно, иначе false
+     */
     private boolean checkAndSetAdminRole(boolean disableAdmin, boolean enableAdmin, AdminRole currentRole, Admin admin) {
         if (disableAdmin && currentRole.equals(DISABLE)) {
             errorCollector.addErrorMessages(

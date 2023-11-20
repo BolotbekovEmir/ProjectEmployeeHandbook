@@ -10,11 +10,14 @@ import javax.validation.constraints.Pattern;
 
 import static lombok.AccessLevel.*;
 
+/**
+ * DTO для создания профиля сотрудника
+ * */
 @Data
 @FieldDefaults(level = PRIVATE)
 public class CreateEmployeeDTO {
 
-    /* ФИО */
+    /* Имя, фамилия */
     @Pattern(
         regexp  = PatternConfiguration.EMPLOYEE_NAME_PATTERN,
         message = ErrorDescription.NAME_PATTERN
@@ -22,6 +25,7 @@ public class CreateEmployeeDTO {
         firstname,
         lastname;
 
+    /* Отчество (опционально) */
     @Pattern(
         regexp  = PatternConfiguration.EMPLOYEE_OPTIONAL_NAME_PATTERN,
         message = ErrorDescription.NAME_PATTERN
@@ -49,9 +53,6 @@ public class CreateEmployeeDTO {
         message = ErrorDescription.ADDRESS_PATTERN
     ) String postalAddress;
 
-    /* Путь до фоточки */
-    String pathPhoto;
-
     /* Статус и семейный статус */
     String
         familyStatus,
@@ -72,7 +73,7 @@ public class CreateEmployeeDTO {
 
     /* Опциональные даты.
      * При неуказании стартовых и конечных дат - будет присвоена текущая дата, а конечные даты останутся null
-     * При указании конечных дат - добавление начальных дат обязательно.
+     * При указании конечных дат, добавление начальных - обязательно.
      */
     @Pattern(
         regexp  = PatternConfiguration.DATE_OPTIONAL_PATTERN,

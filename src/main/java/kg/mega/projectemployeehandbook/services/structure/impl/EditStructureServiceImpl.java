@@ -23,6 +23,9 @@ import static java.lang.String.format;
 import static java.util.List.of;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для изменения структур.
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -34,6 +37,11 @@ public class EditStructureServiceImpl implements EditStructureService {
     ErrorCollector       errorCollector;
     InfoCollector        infoCollector;
 
+    /**
+     * Изменяет структуру на основе переданных данных.
+     * @param editStructureDTO Данные для изменения структуры.
+     * @return Сообщение об успешном выполнении операции изменения структуры.
+     */
     @Override
     @Transactional
     public String editStructure(EditStructureDTO editStructureDTO) {
@@ -61,6 +69,12 @@ public class EditStructureServiceImpl implements EditStructureService {
         return operationSuccessMessage;
     }
 
+    /**
+     * Проверяет данные для изменения структуры на корректность.
+     * @param editStructureDTO Данные для изменения структуры.
+     * @param structure Текущая структура, которую требуется изменить.
+     * @return true, если данные корректны; в противном случае - false.
+     */
     private boolean validateEditStructure(EditStructureDTO editStructureDTO, Structure structure) {
         boolean valid = true;
         valid &= checkAndSetNewMaster(editStructureDTO.getNewMasterId(), structure);
@@ -70,6 +84,12 @@ public class EditStructureServiceImpl implements EditStructureService {
         return valid;
     }
 
+    /**
+     * Проверяет и устанавливает нового руководителя структуры.
+     * @param newMasterId ID нового руководителя структуры.
+     * @param structure Текущая структура, которую требуется изменить.
+     * @return true, если руководитель установлен успешно или не требуется изменение; в противном случае - false.
+     */
     private boolean checkAndSetNewMaster(Long newMasterId, Structure structure) {
         if (newMasterId == null) {
             return true;
@@ -97,6 +117,12 @@ public class EditStructureServiceImpl implements EditStructureService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новый тип структуры.
+     * @param newStructureTypeId ID нового типа структуры.
+     * @param structure Текущая структура, которую требуется изменить.
+     * @return true, если тип структуры установлен успешно или не требуется изменение; в противном случае - false.
+     */
     private boolean checkAndSetNewStructureType(Long newStructureTypeId, Structure structure) {
         if (newStructureTypeId == null) {
             return true;
@@ -124,6 +150,12 @@ public class EditStructureServiceImpl implements EditStructureService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новое имя структуры.
+     * @param newStructureName Новое имя структуры.
+     * @param structure Текущая структура, которую требуется изменить.
+     * @return true, если имя структуры установлено успешно или не требуется изменение; в противном случае - false.
+     */
     private boolean checkAndSetNewStructureName(String newStructureName, Structure structure) {
         if (newStructureName.isBlank()) {
             return true;
@@ -145,6 +177,13 @@ public class EditStructureServiceImpl implements EditStructureService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новый статус активности структуры.
+     * @param disable Флаг отключения структуры.
+     * @param enable Флаг включения структуры.
+     * @param structure Текущая структура, которую требуется изменить.
+     * @return true, если статус активности установлен успешно или не требуется изменение; в противном случае - false.
+     */
     private boolean checkAndSetNewStructureActive(boolean disable, boolean enable, Structure structure) {
         if (disable) {
             if (!structure.getActive()) {

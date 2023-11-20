@@ -13,12 +13,20 @@ import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.*;
 
+/**
+ * Сервис для поиска позиций.
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SearchPositionServiceImpl implements SearchPositionService {
     PositionRepository positionRepository;
 
+    /**
+     * Ищет должности по заданному полю и возвращает их в виде DTO.
+     * @param searchField Поле для поиска должностей.
+     * @return Набор DTO должностей, удовлетворяющих условию поиска.
+     */
     @Override
     public Set<GetPositionDTO> searchPosition(String searchField) {
         Set<Position> searchResult = positionRepository.findAllByPositionNameContainsIgnoreCaseAndActiveIsTrue(searchField);

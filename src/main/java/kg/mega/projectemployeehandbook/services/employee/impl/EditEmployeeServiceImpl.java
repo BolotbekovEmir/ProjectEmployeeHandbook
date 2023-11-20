@@ -34,6 +34,9 @@ import java.util.function.Function;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для редактирования данных сотрудника.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -51,6 +54,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
     ErrorCollector       errorCollector;
     InfoCollector        infoCollector;
 
+    /**
+     * Редактирует профиль сотрудника.
+     *
+     * @param editEmployeeProfileDTO данные для редактирования профиля сотрудника
+     * @return сообщение об успешной операции
+     */
     @Override
     public String editEmployeeProfile(EditEmployeeProfileDTO editEmployeeProfileDTO) {
         errorCollector.cleanup();
@@ -76,23 +85,31 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         return successfulOperationMessage;
     }
 
+    /**
+     * Валидирует данные редактирования профиля сотрудника.
+     *
+     * @param editEmployeeProfileDTO данные для редактирования профиля сотрудника
+     * @param employee               объект сотрудника
+     */
     private void validateEditEmployee(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
-        validateFullName(
+        checkAndSetFullName(
             editEmployeeProfileDTO.getNewFirstname(),
             editEmployeeProfileDTO.getNewLastname(),
             editEmployeeProfileDTO.getNewPatronimyc(),
             employee
         );
         validateUniqueFields(editEmployeeProfileDTO, employee);
-        validateNonEmptyFields(editEmployeeProfileDTO, employee);
+        validatePostalAddress(editEmployeeProfileDTO, employee);
         validateEnumFields(editEmployeeProfileDTO, employee);
         validateDateFields(editEmployeeProfileDTO, employee);
     }
 
-    private void validateFullName(String newFirstName, String newLastName, String newPatronymic, Employee employee) {
-        checkAndSetFullName(newFirstName, newLastName, newPatronymic, employee);
-    }
-
+    /**
+     * Валидирует уникальные поля сотрудника.
+     *
+     * @param editEmployeeProfileDTO данные для редактирования профиля сотрудника
+     * @param employee               объект сотрудника
+     */
     private void validateUniqueFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
         checkAndSetField(
             "personalNumber",
@@ -120,21 +137,25 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         );
     }
 
-    private void validateNonEmptyFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
-        checkAndSetNonEmptyField(
-                "postalAddress",
-                employee.getPostalAddress(),
-                editEmployeeProfileDTO.getNewPostalAddress(),
-                employee::setPostalAddress
-        );
-        checkAndSetNonEmptyField(
-                "pathPhoto",
-                employee.getPathPhoto(),
-                editEmployeeProfileDTO.getNewPathPhoto(),
-                employee::setPathPhoto
-        );
+    /**
+     * Валидирует почтовый адрес сотрудника.
+     *
+     * @param editEmployeeProfileDTO данные для редактирования профиля сотрудника
+     * @param employee               объект сотрудника
+     */
+    private void validatePostalAddress(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
+        if (!editEmployeeProfileDTO.getNewPostalAddress().isBlank()) {
+            infoCollector.addFieldUpdatesInfo("postalAddress", employee.getPostalAddress(), editEmployeeProfileDTO.getNewPostalAddress());
+            employee.setPostalAddress(editEmployeeProfileDTO.getNewPostalAddress());
+        }
     }
 
+    /**
+     * Валидирует перечислимые поля сотрудника.
+     *
+     * @param editEmployeeProfileDTO данные для редактирования профиля сотрудника
+     * @param employee               объект сотрудника
+     */
     private void validateEnumFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
         checkAndSetEnumField(
                 "familyStatus",
@@ -152,6 +173,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         );
     }
 
+    /**
+     * Валидирует поля даты сотрудника.
+     *
+     * @param editEmployeeProfileDTO данные для редактирования профиля сотрудника
+     * @param employee               объект сотрудника
+     */
     private void validateDateFields(EditEmployeeProfileDTO editEmployeeProfileDTO, Employee employee) {
         checkAndSetDate(
                 "birthDate",
@@ -175,6 +202,14 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         );
     }
 
+    /**
+     * Проверяет и устанавливает полное имя сотрудника.
+     *
+     * @param newFirstname  новое имя
+     * @param newLastname   новая фамилия
+     * @param newPatronimyc новое отчество
+     * @param employee      объект сотрудника
+     */
     private void checkAndSetFullName(String newFirstname, String newLastname, String newPatronimyc, Employee employee) {
         if (!newFirstname.isBlank()) {
             infoCollector.addFieldUpdatesInfo(
@@ -204,6 +239,16 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новое значение поля, если оно не пустое, иначе добавляет сообщение об ошибке.
+     *
+     * @param fieldName         имя поля
+     * @param oldValue          старое значение поля
+     * @param newValue          новое значение поля
+     * @param fieldSetter       функция для установки нового значения поля
+     * @param uniquenessChecker функция для проверки уникальности нового значения поля
+     * @param errorDescription  описание ошибки, если новое значение не уникально
+     */
     private void checkAndSetField(
         String fieldName,
         String oldValue,
@@ -222,13 +267,16 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         }
     }
 
-    private void checkAndSetNonEmptyField(String fieldName, String oldValue, String newValue, Consumer<String> fieldSetter) {
-        if (!newValue.isBlank()) {
-            infoCollector.addFieldUpdatesInfo(fieldName, oldValue, newValue);
-            fieldSetter.accept(newValue);
-        }
-    }
-
+    /**
+     * Проверяет и устанавливает новое значение перечисления, если оно не пустое и существует, иначе добавляет сообщение об ошибке.
+     *
+     * @param fieldName    имя поля
+     * @param oldValue     старое значение поля
+     * @param newValue     новое значение поля
+     * @param fieldSetter  функция для установки нового значения поля
+     * @param enumType     тип перечисления
+     * @param <T>          тип перечисления
+     */
     private <T extends Enum<T>> void checkAndSetEnumField(
             String fieldName,
             String oldValue,
@@ -247,6 +295,14 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новое значение даты, если оно не пустое, иначе оставляет старое значение.
+     *
+     * @param fieldName  имя поля
+     * @param oldDate    старое значение даты
+     * @param newDate    новое значение даты
+     * @param dateSetter функция для установки нового значения даты
+     */
     private void checkAndSetDate(
             String fieldName,
             String oldDate,
@@ -260,6 +316,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         }
     }
 
+    /**
+     * Получает сотрудника по его персональному номеру.
+     *
+     * @param personalNumber персональный номер сотрудника
+     * @return объект сотрудника или null, если не найден
+     */
     private Employee getEmployeeByPersonalNumber(String personalNumber) {
         Optional<Employee> employee = employeeRepository.findByPersonalNumber(personalNumber);
 
@@ -271,6 +333,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         return employee.orElse(null);
     }
 
+    /**
+     * Редактирует должность сотрудника.
+     *
+     * @param editEmployeePositionDTO данные для редактирования должности сотрудника
+     * @return сообщение об успешной операции
+     */
     @Override
     public String editEmployeePosition(EditEmployeePositionDTO editEmployeePositionDTO) {
         errorCollector.cleanup();
@@ -298,6 +366,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         return successfulOperationMessage;
     }
 
+    /**
+     * Добавляет операцию изменения должности сотрудника.
+     *
+     * @param employee                    объект сотрудника
+     * @param editEmployeePositionDTO     данные для изменения должности сотрудника
+     */
     private void addedPositionOperation(Employee employee, EditEmployeePositionDTO editEmployeePositionDTO) {
         EmployeePosition employeePosition = new EmployeePosition();
         employeePosition.setEmployee(employee);
@@ -323,6 +397,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         );
     }
 
+    /**
+     * Удаляет операцию изменения должности сотрудника.
+     *
+     * @param employee                    объект сотрудника
+     * @param editEmployeePositionDTO     данные для изменения должности сотрудника
+     */
     private void removePositionOperation(Employee employee, EditEmployeePositionDTO editEmployeePositionDTO) {
         Optional<EmployeePosition> optionalEmployeePosition = employeePositionRepository.findByEmployee_PersonalNumberAndPositionId(
             employee.getPersonalNumber(),
@@ -355,6 +435,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         }
     }
 
+    /**
+     * Редактирует структуру сотрудника.
+     *
+     * @param editEmployeeStructureDTO данные для редактирования структуры сотрудника
+     * @return сообщение об успешной операции
+     */
     @Override
     public String editEmployeeStructure(EditEmployeeStructureDTO editEmployeeStructureDTO) {
         errorCollector.cleanup();
@@ -377,11 +463,17 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
 
         String successfulOperationMessage = String.format(InfoDescription.EDIT_EMPLOYEE_PROFILE_FORMAT, employee.getId());
         infoCollector.setChangerInfo();
-        infoCollector.writeLog(successfulOperationMessage);
+        infoCollector.writeEntityLog(successfulOperationMessage);
 
         return successfulOperationMessage;
     }
 
+    /**
+     * Добавляет структуры сотруднику.
+     *
+     * @param employee                 объект сотрудника
+     * @param editEmployeeStructureDTO данные для изменения структуры сотрудника
+     */
     private void addedStructureOperation(Employee employee, EditEmployeeStructureDTO editEmployeeStructureDTO) {
         EmployeeStructure employeeStructure = new EmployeeStructure();
         employeeStructure.setEmployee(employee);
@@ -407,6 +499,12 @@ public class EditEmployeeServiceImpl implements EditEmployeeService {
         );
     }
 
+    /**
+     * Устанавливает конечные даты структуры сотрудника.
+     *
+     * @param employee                 объект сотрудника
+     * @param editEmployeeStructureDTO данные для изменения структуры сотрудника
+     */
     private void removeStructureOperation(Employee employee, EditEmployeeStructureDTO editEmployeeStructureDTO) {
         Optional<EmployeeStructure> optionalEmployeeStructure = employeeStructureRepository.findByEmployee_PersonalNumberAndStructureId(
             employee.getPersonalNumber(),

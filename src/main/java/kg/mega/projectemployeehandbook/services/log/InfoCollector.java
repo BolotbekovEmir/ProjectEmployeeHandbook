@@ -19,6 +19,12 @@ import java.util.Optional;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Класс, отвечающий за сбор информации о действиях, инициированных администратором,
+ * и формирование логов на основе этой информации.
+ * Содержит методы для очистки, установки информации об администраторе (инициаторе),
+ * сущности и обновлений полей, а также записи соответствующих логов.
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -30,12 +36,19 @@ public class InfoCollector {
     EntityDTO entity;
     List<FieldUpdateDTO> fieldUpdates = new ArrayList<>();
 
+    /**
+     * Очищает информацию о смене, сущности и обновлениях полей. Рекомендуется вызывать данный метод перед использованием.
+     */
     public void cleanup() {
         this.changer = new ChangerDTO();
         this.entity = new EntityDTO();
         this.fieldUpdates = new ArrayList<>();
     }
 
+    /**
+     * Устанавливает информацию об инициаторе изменений (изменении сущности).
+     * Предполагается, что информация об инициаторе хранится в контексте безопасности.
+     */
     public void setChangerInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getPrincipal().toString();
@@ -48,11 +61,24 @@ public class InfoCollector {
         }
     }
 
+    /**
+     * Устанавливает информацию о сущности, над которой выполняется изменение.
+     *
+     * @param id   идентификатор сущности
+     * @param name имя сущности
+     */
     public void setEntityInfo(Long id, String name) {
         this.entity.setId(id);
         this.entity.setName(name);
     }
 
+    /**
+     * Добавляет информацию об обновлении поля в журнал изменений.
+     *
+     * @param fieldName имя поля
+     * @param oldValue  старое значение поля
+     * @param newValue  новое значение поля
+     */
     public void addFieldUpdatesInfo(String fieldName, String oldValue, String newValue) {
         FieldUpdateDTO fieldUpdate = FieldUpdateDTO.builder()
             .name(fieldName)
@@ -61,6 +87,11 @@ public class InfoCollector {
         this.fieldUpdates.add(fieldUpdate);
     }
 
+    /**
+     * Записывает полный журнал изменений в лог с дополнительной информацией.
+     *
+     * @param additionalInfo дополнительная информация для журнала изменений
+     */
     public void writeFullLog(String... additionalInfo) {
         String FULL_MESSAGE_PATTERN = "Инициатор: {}, Сущность: {}, Обновления: {}, Дополнительная информация: {}";
         log.info(
@@ -72,15 +103,11 @@ public class InfoCollector {
         );
     }
 
-    public void writeLog(String... additionalInfo) {
-        String MESSAGE_PATTERN = "Инициатор: {}, Дополнительная информация: {}";
-        log.info(
-            MESSAGE_PATTERN,
-            this.changer,
-            additionalInfo
-        );
-    }
-
+    /**
+     * Записывает журнал изменений сущности в лог с дополнительной информацией.
+     *
+     * @param additionalInfo дополнительная информация для журнала изменений
+     */
     public void writeEntityLog(String... additionalInfo) {
         String MESSAGE_PATTERN = "Инициатор: {}, Сущность: {}, Дополнительная информация: {}";
         log.info(
@@ -88,6 +115,20 @@ public class InfoCollector {
             this.changer,
             this.entity,
             additionalInfo
+        );
+    }
+
+    /**
+     * Записывает общий журнал изменений в лог с дополнительной информацией.
+     *
+     * @param additionalInfo дополнительная информация для журнала изменений
+     */
+    public void writeLog(String... additionalInfo) {
+        String MESSAGE_PATTERN = "Инициатор: {}, Дополнительная информация: {}";
+        log.info(
+                MESSAGE_PATTERN,
+                this.changer,
+                additionalInfo
         );
     }
 }

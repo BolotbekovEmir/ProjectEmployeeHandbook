@@ -22,6 +22,9 @@ import static java.util.List.of;
 import static kg.mega.projectemployeehandbook.models.enums.AdminRole.ADMIN;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для создания администратора.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -35,6 +38,12 @@ public class CreateAdminServiceImpl implements CreateAdminService {
     ErrorCollector      errorCollector;
     InfoCollector       infoCollector;
 
+    /**
+     * Метод для создания администратора.
+     *
+     * @param createAdminDTO объект, содержащий данные для создания администратора
+     * @return сообщение об успешном создании администратора
+     */
     @Override
     @Transactional
     public String createAdmin(CreateAdminDTO createAdminDTO) {
@@ -43,6 +52,7 @@ public class CreateAdminServiceImpl implements CreateAdminService {
 
         isValidCreateAdminData(createAdminDTO);
 
+        // Проверка наличия ошибок при валидации данных
         if (errorCollector.getErrorOccurred()) {
             errorCollector.callException(ExceptionType.CREATE_ENTITY_EXCEPTION);
         }
@@ -51,15 +61,22 @@ public class CreateAdminServiceImpl implements CreateAdminService {
 
         admin.setAdminRole(ADMIN);
 
+        // Хэширование пароля и сохранение в базу
         admin.setPassword(passwordEncoder.encode(createAdminDTO.getPassword()));
         adminRepository.save(admin);
 
+        // Запись информации о создании администратора в лог
         infoCollector.setChangerInfo();
         infoCollector.writeLog(String.format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getId()));
 
         return format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getId());
     }
 
+    /**
+     * Метод для проверки валидности данных при создании администратора.
+     *
+     * @param createAdminDTO объект, содержащий данные для создания администратора
+     */
     private void isValidCreateAdminData(CreateAdminDTO createAdminDTO) {
         if (!validationUniqueService.isUniqueAdminName(createAdminDTO.getAdminName())) {
             errorCollector.addErrorMessages(

@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.*;
 
+/**
+ * Сервис для поиска администраторов.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -26,24 +29,32 @@ public class SearchAdminServiceImpl implements SearchAdminService {
 
     MapperConfiguration mapper;
 
+    /**
+     * Метод для поиска администраторов по заданному критерию.
+     *
+     * @param searchField строка-критерий поиска администраторов
+     * @return множество объектов GetAdminDTO, соответствующих результатам поиска
+     */
     @Override
     public Set<GetAdminDTO> searchAdmins(String searchField) {
-        System.out.println(searchField);
+        // Поиск администраторов по имени, персональному номеру и роли
         Set<Admin>
             adminsByName           = adminRepository.findAllByAdminNameContainsIgnoreCase(searchField),
             adminsByPersonalNumber = adminRepository.findAllByPersonalNumber(searchField),
             searchResult           = new HashSet<>();
 
+        // Поиск администраторов по роли, если переданный критерий является значением перечисления AdminRole
         AdminRole adminRole = commonRepositoryUtil.getEnumByStringName(AdminRole.class, searchField);
-
         if (adminRole != null) {
             Set<Admin> adminsByRole = adminRepository.findAllByAdminRole(adminRole);
             searchResult.addAll(adminsByRole);
         }
 
+        // Объединение результатов поиска
         searchResult.addAll(adminsByName);
         searchResult.addAll(adminsByPersonalNumber);
 
+        // Преобразование найденных администраторов в объекты GetAdminDTO
         return searchResult.stream()
             .map(admin -> mapper.getMapper()
                 .map(admin, GetAdminDTO.class))

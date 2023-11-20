@@ -32,6 +32,9 @@ import java.util.List;
 import static java.lang.String.format;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для создания сотрудника.
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -49,13 +52,19 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     ErrorCollector       errorCollector;
     InfoCollector        infoCollector;
 
+    /**
+     * Создает нового сотрудника на основе предоставленных данных.
+     *
+     * @param createEmployeeDTO объект, содержащий данные для создания нового сотрудника
+     * @return сообщение об успешном завершении операции
+     */
     @Override
     @Transactional
     public String createEmployee(CreateEmployeeDTO createEmployeeDTO) {
         errorCollector.cleanup();
         infoCollector.cleanup();
 
-        validateEmployeeData(createEmployeeDTO);
+        validateEmployeePatronimyc(createEmployeeDTO);
         validateUniqueEmployeeData(createEmployeeDTO);
 
         employeeDateUtil.validateDatePair(createEmployeeDTO.getStructureStartDate(), createEmployeeDTO.getStructureEndDate());
@@ -107,6 +116,15 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         return operationSuccessMessage;
     }
 
+    /**
+     * Создает и возвращает объект EmployeePosition на основе переданных данных.
+     *
+     * @param employee   объект Employee
+     * @param position   объект Position
+     * @param startDate  дата начала
+     * @param endDate    дата окончания
+     * @return объект EmployeePosition
+     */
     private EmployeePosition employeePositionBuilder(
         Employee employee,
         Position position,
@@ -121,6 +139,15 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
             .build();
     }
 
+    /**
+     * Создает и возвращает объект EmployeeStructure на основе переданных данных.
+     *
+     * @param employee   объект Employee
+     * @param structure  объект Structure
+     * @param startDate  дата начала
+     * @param endDate    дата окончания
+     * @return объект EmployeeStructure
+     */
     private EmployeeStructure employeeStructureBuilder(
         Employee employee,
         Structure structure,
@@ -135,6 +162,14 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
             .build();
     }
 
+    /**
+     * Создает и возвращает объект Employee на основе данных из объекта CreateEmployeeDTO.
+     *
+     * @param createEmployeeDTO объект CreateEmployeeDTO
+     * @param familyStatus      статус семейного положения
+     * @param status            статус сотрудника
+     * @return объект Employee
+     */
     private Employee employeeBuilder(CreateEmployeeDTO createEmployeeDTO, FamilyStatus familyStatus, Status status) {
         return new Employee(
             createEmployeeDTO,
@@ -146,17 +181,22 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         );
     }
 
-    private void validateEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
-        if (createEmployeeDTO.getPathPhoto().isBlank()) {
-            errorCollector.addErrorMessages(
-                List.of(ErrorDescription.PHOTO_NULL)
-            );
-        }
+    /**
+     * Проверяет и обнуляет значение поля "отчество" в объекте CreateEmployeeDTO, если оно пустое.
+     *
+     * @param createEmployeeDTO объект CreateEmployeeDTO
+     */
+    private void validateEmployeePatronimyc(CreateEmployeeDTO createEmployeeDTO) {
         if (createEmployeeDTO.getPatronimyc().isBlank()) {
             createEmployeeDTO.setPatronimyc(null);
         }
     }
 
+    /**
+     * Проверяет уникальность данных сотрудника перед сохранением.
+     *
+     * @param createEmployeeDTO объект CreateEmployeeDTO
+     */
     private void validateUniqueEmployeeData(CreateEmployeeDTO createEmployeeDTO) {
         if (!validationUniqueService.isUniqueEmployeePersonalNumber(createEmployeeDTO.getPersonalNumber())) {
             errorCollector.addErrorMessages(
@@ -175,8 +215,17 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         }
     }
 
-    private <E extends Enum<E>> E checkEnum(Class<E> enumCLass, String enumName, String errorMessage) {
-        E enumObject = commonRepositoryUtil.getEnumByStringName(enumCLass, enumName);
+    /**
+     * Проверяет строковое значение на соответствие перечислению.
+     *
+     * @param enumClass    класс перечисления
+     * @param enumName     строковое значение для проверки
+     * @param errorMessage сообщение об ошибке, если значение не соответствует перечислению
+     * @param <E>          тип перечисления
+     * @return объект перечисления
+     */
+    private <E extends Enum<E>> E checkEnum(Class<E> enumClass, String enumName, String errorMessage) {
+        E enumObject = commonRepositoryUtil.getEnumByStringName(enumClass, enumName);
 
         if (enumObject == null) {
             errorCollector.addErrorMessages(
@@ -187,6 +236,13 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         return enumObject;
     }
 
+    /**
+     * Сохраняет сущности Employee, EmployeeStructure и EmployeePosition в репозитории.
+     *
+     * @param employee          объект Employee
+     * @param employeeStructure объект EmployeeStructure
+     * @param employeePosition  объект EmployeePosition
+     */
     private void saveEntities(
         Employee employee,
         EmployeeStructure employeeStructure,

@@ -4,7 +4,7 @@ spring:
   main:
     banner-mode: off
   datasource:
-    url: jdbc:postgresql://localhost:5432/db_project_handbook
+    url: jdbc:postgresql://localhost:5432/db_project_employee_handbook
     username: postgres
     password: postgres
   jpa:

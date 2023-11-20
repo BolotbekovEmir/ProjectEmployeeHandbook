@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
 import static lombok.AccessLevel.PRIVATE;
-
+/**
+ * Сервис для создания структур.
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -29,6 +31,11 @@ public class CreateStructureServiceImpl implements CreateStructureService {
     ErrorCollector       errorCollector;
     InfoCollector        infoCollector;
 
+    /**
+     * Создает новую структуру на основе переданных данных.
+     * @param createStructureDTO Данные для создания новой структуры.
+     * @return Сообщение об успешном выполнении операции создания структуры.
+     */
     @Override
     public String createStructure(CreateStructureDTO createStructureDTO) {
         errorCollector.cleanup();

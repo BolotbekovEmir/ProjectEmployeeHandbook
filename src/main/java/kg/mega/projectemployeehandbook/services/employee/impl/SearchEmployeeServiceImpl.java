@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис поиска сотрудников
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -38,6 +41,12 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
 
     CommonRepositoryUtil commonRepositoryUtil;
 
+    /**
+     * Реализация поиска сотрудников по различным критериям.
+     *
+     * @param searchField строка для поиска среди различных полей сотрудника
+     * @return набор DTO с информацией о найденных сотрудниках
+     */
     @Override
     public Set<GetEmployeeDTO> searchEmployees(String searchField) {
         Set<Employee>
@@ -92,6 +101,12 @@ public class SearchEmployeeServiceImpl implements SearchEmployeeService {
             .collect(Collectors.toSet()));
     }
 
+    /**
+     * Преобразует набор объектов сотрудников в набор DTO сотрудников.
+     *
+     * @param employees набор объектов сотрудников, для которых создаются DTO
+     * @return набор DTO с информацией о сотрудниках
+     */
     private Set<GetEmployeeDTO> mapper(Set<Employee> employees) {
         return employees.stream()
             // Создание DTO для каждого сотрудника на основе его данных

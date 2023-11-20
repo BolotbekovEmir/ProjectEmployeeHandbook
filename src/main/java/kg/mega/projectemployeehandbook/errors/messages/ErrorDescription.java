@@ -1,5 +1,8 @@
 package kg.mega.projectemployeehandbook.errors.messages;
 
+/**
+ * Класс-хранилище сообщений об ошибках, содержит константы с их описанием
+ */
 public class ErrorDescription {
     public static final String
 
@@ -32,7 +35,6 @@ public class ErrorDescription {
         PHONE_UNIQUE = "Данный номер телефона уже используется",
         EMAIL_UNIQUE = "Данная электронная почта уже используется",
         PERSONAL_NUMBER_UNIQUE = "Данный персональный номер уже используется",
-        PHOTO_NULL = "Добавление фотографии является обязательной операцией",
         FAMILY_STATUS_IS_EMPTY = "Семейный статус не может быть пустым",
         STATUS_IS_EMPTY = "Статус не может быть пустым",
         END_DATE_IS_PRESENT_BUT_START_DATE_IS_NULL_FORMAT = "При наличии конечной даты - начальная должна быть указана {%s}",
@@ -42,6 +44,7 @@ public class ErrorDescription {
         INVALID_THIS_STRUCTURE = "За сотрудником не закреплена данная организационная структура",
         ENUM_TYPE_NOT_FOUND = "Неизвестный тип перечисления",
         EMPLOYEE_ID_NOT_FOUND = "Сотрудник по данному ID не найден",
+        IMAGE_ERROR = "Ошибка загрузки фотографии сотрудника",
 
         /* Сообщения типа структур */
 

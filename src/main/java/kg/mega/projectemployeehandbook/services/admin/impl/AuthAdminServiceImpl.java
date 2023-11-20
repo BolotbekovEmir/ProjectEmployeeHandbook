@@ -24,6 +24,9 @@ import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для аутентификации администратора.
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -34,6 +37,12 @@ public class AuthAdminServiceImpl implements AuthAdminService {
     AuthenticationManager authManager;
     JwtUtil               jwtUtil;
 
+    /**
+     * Метод для аутентификации администратора.
+     *
+     * @param authDTO объект, содержащий данные для аутентификации
+     * @return объект TokenAdminDTO с токеном для аутентификации администратора
+     */
     @Override
     @Transactional
     public TokenAdminDTO authentication(AuthAdminDTO authDTO) {
@@ -56,6 +65,13 @@ public class AuthAdminServiceImpl implements AuthAdminService {
         return jwtUtil.parseToken(token);
     }
 
+    /**
+     * Метод для загрузки информации об администраторе по имени пользователя.
+     *
+     * @param adminName имя администратора
+     * @return объект UserDetails с информацией об администраторе
+     * @throws UsernameNotFoundException если пользователь с указанным именем не найден
+     */
     @Override
     public UserDetails loadUserByUsername(String adminName) throws UsernameNotFoundException {
         Admin admin = adminRepository.findByAdminName(adminName).orElseThrow(

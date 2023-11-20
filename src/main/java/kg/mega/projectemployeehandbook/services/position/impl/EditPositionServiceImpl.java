@@ -21,6 +21,9 @@ import static java.lang.String.format;
 import static java.util.List.of;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервисный класс для внесения изменений в информацию о должностях.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -31,6 +34,11 @@ public class EditPositionServiceImpl implements EditPositionService {
     ErrorCollector       errorCollector;
     InfoCollector        infoCollector;
 
+    /**
+     * Редактирует информацию о должности на основе переданных данных.
+     * @param editPositionDTO Данные для редактирования должности.
+     * @return Сообщение об успешном завершении операции.
+     */
     @Override
     @Transactional
     public String editPosition(EditPositionDTO editPositionDTO) {
@@ -57,14 +65,26 @@ public class EditPositionServiceImpl implements EditPositionService {
         return operationSuccessMessage;
     }
 
+    /**
+     * Проверяет валидность изменений в данных о должности на основе переданных параметров.
+     * @param editPositionDTO Данные для редактирования должности.
+     * @param position Объект текущей должности.
+     * @return True, если все изменения прошли проверку, в противном случае - false.
+     */
     private boolean validateEditPosition(EditPositionDTO editPositionDTO, Position position) {
         boolean valid = true;
         valid &= checkAndSetNewPositionMaster(editPositionDTO.getNewMasterId(), position);
         valid &= checkAndSetNewPositionName(editPositionDTO.getNewPositionName(), position);
-        valid &= checkAndSetNewPositionActive(editPositionDTO.isDisable(), editPositionDTO.isEnable(), position);
+        valid &= checkAndSetNewPositionActive(editPositionDTO.getDisable(), editPositionDTO.getEnable(), position);
         return valid;
     }
 
+    /**
+     * Проверяет и устанавливает новую должность-руководителя, если она была изменена.
+     * @param newMasterId Новый идентификатор должности-руководителя.
+     * @param position Объект текущей должности.
+     * @return True, если операция выполнена успешно, в противном случае - false.
+     */
     private boolean checkAndSetNewPositionMaster(Long newMasterId, Position position) {
         if (newMasterId == null) {
             return true;
@@ -92,6 +112,12 @@ public class EditPositionServiceImpl implements EditPositionService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новое название должности, если оно было изменено.
+     * @param newPositionName Новое название должности.
+     * @param position Объект текущей должности.
+     * @return True, если операция выполнена успешно, в противном случае - false.
+     */
     private boolean checkAndSetNewPositionName(String newPositionName, Position position) {
         if (newPositionName.isBlank()) {
             return true;
@@ -113,6 +139,13 @@ public class EditPositionServiceImpl implements EditPositionService {
         }
     }
 
+    /**
+     * Проверяет и устанавливает новый статус активности должности, если он был изменен.
+     * @param disable Флаг для деактивации должности.
+     * @param enable Флаг для активации должности.
+     * @param position Объект текущей должности.
+     * @return True, если операция выполнена успешно, в противном случае - false.
+     */
     private boolean checkAndSetNewPositionActive(boolean disable, boolean enable, Position position) {
         if (disable) {
             if (!position.getActive()) {

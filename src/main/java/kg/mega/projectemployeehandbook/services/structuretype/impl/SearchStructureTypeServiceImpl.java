@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.*;
 
+/**
+ * Реализация сервиса поиска типов структур.
+ * Позволяет искать типы структур по их имени или идентификатору.
+ * Предоставляет методы для выполнения поиска типов структур и их маппинга на DTO.
+ */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -26,6 +31,13 @@ public class SearchStructureTypeServiceImpl implements SearchStructureTypeServic
     CommonRepositoryUtil commonRepositoryUtil;
     MapperConfiguration  mapper;
 
+    /**
+     * Выполняет поиск типов структур на основе переданного поискового запроса.
+     * Если поисковый запрос пустой, возвращает активные типы структур.
+     * В противном случае ищет типы структур по их имени или идентификатору.
+     * @param searchField Поисковый запрос - имя типа структуры или его идентификатор.
+     * @return Набор DTO, соответствующих найденным типам структур.
+     */
     @Override
     public Set<GetStructureTypeDTO> searchStructureType(String searchField) {
         if (searchField.isBlank()) {
@@ -51,11 +63,15 @@ public class SearchStructureTypeServiceImpl implements SearchStructureTypeServic
         return mapResult(resultSearch);
     }
 
+    /**
+     * Отображает набор типов структур на набор DTO типов структур.
+     * @param structureTypes Набор типов структур для отображения.
+     * @return Набор DTO типов структур.
+     */
     private Set<GetStructureTypeDTO> mapResult(Set<StructureType> structureTypes) {
         return structureTypes.stream()
             .map(e -> mapper.getMapper()
                 .map(e, GetStructureTypeDTO.class))
             .collect(Collectors.toSet());
     }
-
 }

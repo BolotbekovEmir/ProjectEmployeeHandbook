@@ -13,6 +13,9 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Утилита для работы с JWT-токенами.
+ */
 @Component
 public class JwtUtil {
 
@@ -21,6 +24,11 @@ public class JwtUtil {
 
     SecretKey secretKey = Jwts.SIG.HS256.key().build();
 
+    /**
+     * Генерация JWT-токена для пользователя.
+     * @param user Информация о пользователе.
+     * @return Сгенерированный JWT-токен.
+     */
     public String generateToken(UserDetails user) {
         Date issuedDate = new Date();
         Date expirationDate = new Date(issuedDate.getTime() + lifetime.toNanos());
@@ -36,6 +44,11 @@ public class JwtUtil {
             .compact();
     }
 
+    /**
+     * Парсинг JWT-токена для получения информации о пользователе.
+     * @param token JWT-токен.
+     * @return Информация о пользователе из токена.
+     */
     public TokenAdminDTO parseToken(String token) {
         TokenAdminDTO userTokenDTO = new TokenAdminDTO();
         Claims claims = getClaims(token);
@@ -45,6 +58,11 @@ public class JwtUtil {
         return userTokenDTO;
     }
 
+    /**
+     * Получение данных из токена.
+     * @param token JWT-токен.
+     * @return Данные из токена.
+     */
     private Claims getClaims(String token) {
         return Jwts.parser()
             .verifyWith(secretKey)
@@ -53,12 +71,21 @@ public class JwtUtil {
             .getPayload();
     }
 
+    /**
+     * Получение имени администратора из токена.
+     * @param token JWT-токен.
+     * @return Имя администратора.
+     */
     public String getAdminName(String token) {
         return getClaims(token).getSubject();
     }
 
+    /**
+     * Получение списка ролей из токена.
+     * @param token JWT-токен.
+     * @return Список ролей.
+     */
     public List<String> getRoles(String token) {
         return getClaims(token).get("roles", List.class);
     }
-
 }

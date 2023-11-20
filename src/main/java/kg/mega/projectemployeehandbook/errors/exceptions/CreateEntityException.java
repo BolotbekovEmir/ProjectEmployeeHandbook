@@ -17,5 +17,4 @@ public class CreateEntityException extends RuntimeException {
     public Collection<String> getErrorDescriptions() {
         return errorDescriptions;
     }
-
 }

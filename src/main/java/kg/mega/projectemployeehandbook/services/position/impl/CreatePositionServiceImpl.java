@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import static java.lang.String.format;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Сервис для создания позиции.
+ * */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -26,6 +29,12 @@ public class CreatePositionServiceImpl implements CreatePositionService {
     ErrorCollector       errorCollector;
     InfoCollector        infoCollector;
 
+    /**
+     * Создает новую должность на основе предоставленных данных.
+     *
+     * @param createPositionDTO объект с данными для создания должности
+     * @return сообщение об успешном выполнении операции создания должности
+     */
     @Override
     public String createPosition(CreatePositionDTO createPositionDTO) {
         errorCollector.cleanup();

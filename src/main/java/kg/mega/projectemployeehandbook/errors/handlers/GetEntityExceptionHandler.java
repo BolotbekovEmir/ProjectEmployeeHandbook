@@ -32,8 +32,10 @@ public class GetEntityExceptionHandler {
         String errorName = ErrorDescription.ENTITY_NOT_FOUND;
         List<String> descriptions = exception.getErrorMessages().stream().toList();
 
+        // Логирует ошибку
         loggingService.logError(String.format("%s: %s", errorName, descriptions));
 
+        // Формирует ответ с ошибкой
         return ResponseEntity.badRequest().body(
             ApiResult.builder()
                 .httpStatus(BAD_REQUEST)

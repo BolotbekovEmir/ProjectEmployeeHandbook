@@ -5,16 +5,21 @@ import lombok.experimental.FieldDefaults;
 
 import static lombok.AccessLevel.*;
 
+/**
+ * DTO для создания структуры
+ * */
 @Data
 @FieldDefaults(level = PRIVATE)
 public class CreateStructureDTO {
-
+    /* Имя структуры */
     String structureName;
 
-    Long
-        structureTypeId,
-        masterId;
+    /* ID типа стурктуры */
+    Long structureTypeId;
 
+    /* ID структуры-начальника */
+    Long masterId;
+
+    /* Активность структуры */
     Boolean active;
-
 }

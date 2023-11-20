@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.http.HttpStatus.OK;
 
+/**
+ * Контроллер для управления действиями с должностями в API v1.
+ */
 @RestController
 @RequestMapping("/api/v1/positions")
 @RequiredArgsConstructor
@@ -23,6 +26,12 @@ public class PositionController {
     SearchPositionService searchPositionService;
     EditPositionService   editPositionService;
 
+    /**
+     * Создает новую должность.
+     *
+     * @param createPositionDTO данные для создания должности
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreatePositionDTO createPositionDTO) {
         return ResponseEntity.ok().body(
@@ -35,6 +44,12 @@ public class PositionController {
         );
     }
 
+    /**
+     * Изменяет данные должности.
+     *
+     * @param editPositionDTO данные для изменения должности
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody EditPositionDTO editPositionDTO) {
         return ResponseEntity.ok().body(
@@ -47,6 +62,12 @@ public class PositionController {
         );
     }
 
+    /**
+     * Ищет должности по заданному полю.
+     *
+     * @param searchField поле для поиска должностей
+     * @return ResponseEntity с набор GetPositionDTO, при не нахождении - пустой набор
+     */
     @GetMapping("find-by")
     public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(
@@ -58,5 +79,4 @@ public class PositionController {
                 ).build()
         );
     }
-
 }

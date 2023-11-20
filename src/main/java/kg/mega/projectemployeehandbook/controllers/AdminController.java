@@ -14,6 +14,9 @@ import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+/**
+ * Контроллер для управления действиями администраторов в API v1.
+ */
 @RestController
 @RequestMapping("/api/v1/admins")
 @RequiredArgsConstructor
@@ -25,6 +28,12 @@ public class AdminController {
     AuthAdminService           authAdminService;
     EditAdminService           editAdminService;
 
+    /**
+     * Создает нового администратора.
+     *
+     * @param createAdminDTO данные для создания администратора
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
         return ResponseEntity.ok().body(
@@ -37,6 +46,12 @@ public class AdminController {
         );
     }
 
+    /**
+     * Изменяет данные администратора.
+     *
+     * @param editAdminDTO данные для изменения администратора
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody @Valid EditAdminDTO editAdminDTO) {
         return ResponseEntity.ok().body(
@@ -49,6 +64,12 @@ public class AdminController {
         );
     }
 
+    /**
+     * Поиск администраторов по заданному полю.
+     *
+     * @param searchField поле для поиска администраторов
+     * @return ResponseEntity с набором GetAdminDTO, в случае ненахождения - пустой набор
+     */
     @GetMapping("find-by")
     public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(
@@ -61,6 +82,12 @@ public class AdminController {
         );
     }
 
+    /**
+     * Изменяет пароль администратора.
+     *
+     * @param changeAdminPasswordDTO данные для изменения пароля администратора
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PatchMapping("change-password")
     public ResponseEntity<ApiResult> changePassword(@RequestBody @Valid ChangeAdminPasswordDTO changeAdminPasswordDTO) {
         return ResponseEntity.ok().body(
@@ -73,6 +100,12 @@ public class AdminController {
         );
     }
 
+    /**
+     * Аутентификация администратора.
+     *
+     * @param authAdminDTO данные для аутентификации администратора
+     * @return ResponseEntity с AdminTokenDTO при успешной авторизации
+     */
     @PostMapping("auth")
     public ResponseEntity<ApiResult> adminAuth(@RequestBody @Valid AuthAdminDTO authAdminDTO) {
         return ResponseEntity.ok().body(
@@ -84,5 +117,4 @@ public class AdminController {
                 ).build()
         );
     }
-
 }

@@ -5,10 +5,15 @@ import lombok.experimental.FieldDefaults;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * DTO для получения представления об инициаторе
+ * */
 @Data
 @FieldDefaults(level = PRIVATE)
 public class ChangerDTO {
+    /* ID инициатора */
     Long id;
+    /* Имя инициатора */
     String name;
 
     @Override

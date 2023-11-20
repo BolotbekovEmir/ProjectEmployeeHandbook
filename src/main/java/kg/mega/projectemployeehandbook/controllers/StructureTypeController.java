@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import static lombok.AccessLevel.*;
 import static org.springframework.http.HttpStatus.*;
 
+/**
+ * Контроллер для управления типами структур в API v1.
+ */
 @RestController
 @RequestMapping("/api/v1/structure-types")
 @RequiredArgsConstructor
@@ -23,6 +26,12 @@ public class StructureTypeController {
     SearchStructureTypeService searchStructureTypeService;
     EditStructureTypeService   editStructureTypeService;
 
+    /**
+     * Создает новый тип структуры.
+     *
+     * @param createStructureTypeDTO данные для создания типа структуры
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureTypeDTO createStructureTypeDTO) {
         return ResponseEntity.ok().body(
@@ -35,6 +44,12 @@ public class StructureTypeController {
         );
     }
 
+    /**
+     * Изменяет данные типа структуры.
+     *
+     * @param editStructureTypeDTO данные для изменения типа структуры
+     * @return ResponseEntity со строковым результатом операции
+     */
     @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody EditStructureTypeDTO editStructureTypeDTO) {
         return ResponseEntity.ok().body(
@@ -47,6 +62,12 @@ public class StructureTypeController {
         );
     }
 
+    /**
+     * Ищет типы структур по заданному полю.
+     *
+     * @param searchField поле для поиска типов структур
+     * @return ResponseEntity с набором GetStructureTypeDTO, в случае ненахождения - пустой набор
+     */
     @GetMapping("find-by")
     public ResponseEntity<ApiResult> search(@RequestParam String searchField) {
         return ResponseEntity.ok().body(

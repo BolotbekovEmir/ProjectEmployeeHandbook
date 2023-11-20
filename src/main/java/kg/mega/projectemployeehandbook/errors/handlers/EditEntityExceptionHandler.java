@@ -19,12 +19,21 @@ import static java.util.List.*;
 import static lombok.AccessLevel.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+/**
+ * Глобальный обработчик исключений для ошибок при редактировании сущностей.
+ */
 @ControllerAdvice
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class EditEntityExceptionHandler {
     LoggingService loggingService;
 
+    /**
+     * Обрабатывает исключение EditEntityException и формирует ответ с ошибкой.
+     *
+     * @param exception исключение, связанное с ошибкой редактирования сущности
+     * @return ResponseEntity с результатом операции и описанием ошибки
+     */
     @ExceptionHandler(EditEntityException.class)
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
@@ -32,8 +41,10 @@ public class EditEntityExceptionHandler {
         String errorName = ErrorDescription.EDIT_ENTITY_ERROR;
         List<String> descriptions = exception.getErrorMessages().stream().toList();
 
+        // Логирует ошибку
         loggingService.logError(String.format("%s: %s", errorName, descriptions));
 
+        // Формирует ответ с ошибкой
         return ResponseEntity.badRequest().body(
             ApiResult.builder()
                 .httpStatus(BAD_REQUEST)
@@ -45,5 +56,4 @@ public class EditEntityExceptionHandler {
                 .build()
         );
     }
-
 }

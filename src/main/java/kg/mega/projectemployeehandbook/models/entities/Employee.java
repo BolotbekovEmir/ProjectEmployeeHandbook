@@ -43,7 +43,6 @@ public class Employee {
 
     String postalAddress;
 
-    @Column(nullable = false)
     String pathPhoto;
 
     @Column(nullable = false)
@@ -76,7 +75,6 @@ public class Employee {
         this.personalNumber = createEmployeeDTO.getPersonalNumber();
         this.phone          = createEmployeeDTO.getPhone();
         this.email          = createEmployeeDTO.getEmail();
-        this.pathPhoto      = createEmployeeDTO.getPathPhoto();
         this.postalAddress  = createEmployeeDTO.getPostalAddress();
         this.familyStatus   = familyStatus;
         this.status         = status;

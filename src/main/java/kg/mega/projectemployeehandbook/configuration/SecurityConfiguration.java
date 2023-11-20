@@ -21,18 +21,32 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Конфигурация безопасности приложения, определяющая правила доступа к различным конечным точкам API и настройки аутентификации.
+ */
 @EnableWebSecurity
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SecurityConfiguration {
     AuthAdminService authAdminService;
     TokenFilterConfiguration tokenFilter;
 
+    /**
+     * Конструктор класса SecurityConfiguration.
+     * @param authAdminService Сервис аутентификации администраторов.
+     * @param tokenFilter Конфигурация фильтра токенов.
+     */
     @Autowired
     public SecurityConfiguration(@Lazy AuthAdminService authAdminService, @Lazy TokenFilterConfiguration tokenFilter) {
         this.authAdminService = authAdminService;
         this.tokenFilter = tokenFilter;
     }
 
+    /**
+     * Настройка цепочки фильтров безопасности HTTP для определения прав доступа к различным конечным точкам API.
+     * @param http Объект HttpSecurity для настройки прав доступа.
+     * @return SecurityFilterChain для применения прав доступа.
+     * @throws Exception В случае ошибки при настройке прав доступа.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)
         throws Exception {
@@ -49,9 +63,9 @@ public class SecurityConfiguration {
             .antMatchers("/api/v1/positions/find-by").permitAll()
 
             .antMatchers("/api/v1/employees/*").hasAnyAuthority(AdminRole.ADMIN.name(), AdminRole.SYSTEM_ADMIN.name())
-            .antMatchers("/api/v1/structures/*").hasAuthority(AdminRole.ADMIN.name())
-            .antMatchers("/api/v1/structure-types/*").hasAuthority(AdminRole.ADMIN.name())
-            .antMatchers("/api/v1/positions/*").hasAuthority(AdminRole.ADMIN.name())
+            .antMatchers("/api/v1/structures/*").hasAnyAuthority(AdminRole.ADMIN.name(), AdminRole.SYSTEM_ADMIN.name())
+            .antMatchers("/api/v1/structure-types/*").hasAnyAuthority(AdminRole.ADMIN.name(), AdminRole.SYSTEM_ADMIN.name())
+            .antMatchers("/api/v1/positions/*").hasAnyAuthority(AdminRole.ADMIN.name(), AdminRole.SYSTEM_ADMIN.name())
             .antMatchers("/api/v1/admins/change-password").hasAnyAuthority(AdminRole.SYSTEM_ADMIN.name(), AdminRole.ADMIN.name())
 
             .antMatchers("/api/v1/*").hasAuthority(AdminRole.SYSTEM_ADMIN.name())
@@ -68,12 +82,22 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Конфигурация менеджера аутентификации для использования при аутентификации запросов.
+     * @param authenticationConfiguration Конфигурация аутентификации.
+     * @return Менеджер аутентификации для обработки запросов на аутентификацию.
+     * @throws Exception В случае ошибки при создании менеджера аутентификации.
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
         throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * Конфигурация аутентификационного провайдера для установки шифрования паролей и предоставления пользовательских данных для аутентификации.
+     * @return DaoAuthenticationProvider для обработки аутентификации.
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
@@ -82,6 +106,10 @@ public class SecurityConfiguration {
         return daoAuthenticationProvider;
     }
 
+    /**
+     * Создание объекта PasswordEncoder для шифрования паролей.
+     * @return PasswordEncoder для шифрования паролей.
+     */
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();

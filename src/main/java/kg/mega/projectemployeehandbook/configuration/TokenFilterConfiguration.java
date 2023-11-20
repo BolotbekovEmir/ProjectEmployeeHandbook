@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Конфигурация фильтра токенов для обработки запросов аутентификации с использованием JWT-токенов.
+ */
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -29,6 +32,14 @@ public class TokenFilterConfiguration extends OncePerRequestFilter {
     LoggingService loggingService;
     JwtUtil        jwtUtil;
 
+    /**
+     * Фильтрация запросов для обработки JWT-токенов.
+     * @param request HTTP-запрос.
+     * @param response HTTP-ответ.
+     * @param filterChain Цепочка фильтров.
+     * @throws ServletException В случае ошибки в сервлете.
+     * @throws IOException В случае ошибки ввода/вывода.
+     */
     @Override
     protected void doFilterInternal(
         HttpServletRequest request,

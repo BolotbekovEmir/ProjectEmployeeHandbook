@@ -1,14 +1,16 @@
 package kg.mega.projectemployeehandbook.errors.messages;
 
+/**
+ * Класс-хранилище информационных сообщений, содержит константы с их описанием
+ * */
 public class InfoDescription {
-
     public static final String
 
         /* Сообщения администратора */
 
         CREATE_ADMIN_FORMAT = "Создан администратор с ID %d",
         EDIT_ADMIN_FORMAT = "Изменен администратор с ID %d",
-        ADMIN_PASSWORD_CHANGE = "Изменен пароль у администратора с ID %d",
+        ADMIN_PASSWORD_CHANGE_FORMAT = "Изменен пароль у администратора с ID %d",
 
         /* Сообщения тип структур */
 
@@ -27,6 +29,6 @@ public class InfoDescription {
         /* Сообщения для сотрудников */
 
         CREATE_EMPLOYEE_FORMAT = "Создан сотрудник с ID %d",
-        EDIT_EMPLOYEE_PROFILE_FORMAT = "Изменен профиль сотрудника с ID %d";
-
+        EDIT_EMPLOYEE_PROFILE_FORMAT = "Изменен профиль сотрудника с ID %d",
+        ADDED_EMPLOYEE_PHOTO_FORMAT = "Добавлена фотография сотруднику с персональным номером '%s'";
 }
