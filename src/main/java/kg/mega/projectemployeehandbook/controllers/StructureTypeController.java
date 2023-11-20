@@ -23,7 +23,7 @@ public class StructureTypeController {
     SearchStructureTypeService searchStructureTypeService;
     EditStructureTypeService   editStructureTypeService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureTypeDTO createStructureTypeDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -35,7 +35,7 @@ public class StructureTypeController {
         );
     }
 
-    @PatchMapping
+    @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody EditStructureTypeDTO editStructureTypeDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()

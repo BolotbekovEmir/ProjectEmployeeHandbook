@@ -18,6 +18,7 @@ import kg.mega.projectemployeehandbook.repositories.junction.EmployeePositionRep
 import kg.mega.projectemployeehandbook.repositories.junction.EmployeeStructureRepository;
 import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.employee.CreateEmployeeService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -48,11 +49,13 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
     CommonRepositoryUtil commonRepositoryUtil;
     EmployeeDateUtil     employeeDateUtil;
     ErrorCollector       errorCollector;
+    InfoCollector        infoCollector;
 
     @Override
     @Transactional
     public String createEmployee(CreateEmployeeDTO createEmployeeDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         validateEmployeeData(createEmployeeDTO);
         validateUniqueEmployeeData(createEmployeeDTO);
@@ -98,7 +101,11 @@ public class CreateEmployeeServiceImpl implements CreateEmployeeService {
         saveEntities(employee, employeeStructure, employeePosition);
 
         String operationSuccessMessage = format(InfoDescription.CREATE_EMPLOYEE_FORMAT, employee.getId());
-        loggingService.logInfo(operationSuccessMessage);
+
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(employee.getId(), employee.getPersonalNumber());
+        infoCollector.writeLog(operationSuccessMessage);
+
         return operationSuccessMessage;
     }
 

@@ -1,15 +1,15 @@
 package kg.mega.projectemployeehandbook.services.admin.impl;
 
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.admin.EditAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.enums.AdminRole;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.services.admin.EditAdminService;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,16 +33,17 @@ public class EditAdminServiceImpl implements EditAdminService {
     AdminRepository adminRepository;
 
     ValidationUniqueService validationUniqueService;
-    LoggingService          loggingService;
 
     PasswordEncoder passwordEncoder;
     ErrorCollector  errorCollector;
+    InfoCollector   infoCollector;
 
 
     @Override
     @Transactional
     public String editAdmin(EditAdminDTO editAdminDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         String searchedAdminName = editAdminDTO.getSearchedAdminName();
         Admin admin = getAdminFindByName(searchedAdminName);
@@ -53,9 +54,13 @@ public class EditAdminServiceImpl implements EditAdminService {
 
         adminRepository.save(Objects.requireNonNull(admin));
 
-        String operationSuccessMessage = format(InfoDescription.EDIT_ADMIN_FORMAT, searchedAdminName);
-        loggingService.logInfo(operationSuccessMessage);
-        return operationSuccessMessage;
+        String successfulMessage = format(InfoDescription.EDIT_ADMIN_FORMAT, admin.getId());
+
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(admin.getId(), admin.getAdminName());
+        infoCollector.writeFullLog(successfulMessage);
+
+        return format(successfulMessage);
     }
 
     private Admin getAdminFindByName(String adminName) {
@@ -64,6 +69,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             errorCollector.addErrorMessages(
                 of(ErrorDescription.ADMIN_NAME_NOT_FOUND)
             );
+            errorCollector.callException(ExceptionType.EDIT_ENTITY_EXCEPTION);
         }
         return optionalAdmin.orElseThrow();
     }
@@ -93,6 +99,8 @@ public class EditAdminServiceImpl implements EditAdminService {
             );
             return false;
         }
+
+        infoCollector.addFieldUpdatesInfo("adminName", admin.getAdminName(), newAdminName);
         admin.setAdminName(newAdminName);
         return true;
     }
@@ -113,6 +121,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             );
             return false;
         }
+        infoCollector.addFieldUpdatesInfo("personalNumber", admin.getPersonalNumber(), newPersonalNumber);
         admin.setPersonalNumber(newPersonalNumber);
         return true;
     }
@@ -133,6 +142,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             );
             return false;
         }
+        infoCollector.addFieldUpdatesInfo("password", "HIDDEN", "HIDDEN");
         admin.setPassword(passwordEncoder.encode(newPassword));
         return true;
     }
@@ -144,6 +154,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             );
             return false;
         } else if (disableAdmin) {
+            infoCollector.addFieldUpdatesInfo("role", admin.getAdminRole().name(), DISABLE.name());
             admin.setAdminRole(DISABLE);
         }
         if (enableAdmin && currentRole.equals(ADMIN)) {
@@ -152,6 +163,7 @@ public class EditAdminServiceImpl implements EditAdminService {
             );
             return false;
         } else if (enableAdmin) {
+            infoCollector.addFieldUpdatesInfo("role", admin.getAdminRole().name(), ADMIN.name());
             admin.setAdminRole(ADMIN);
         }
         return true;

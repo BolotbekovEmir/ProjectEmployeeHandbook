@@ -6,6 +6,7 @@ import kg.mega.projectemployeehandbook.models.dto.position.CreatePositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
 import kg.mega.projectemployeehandbook.errors.ErrorCollector;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.position.CreatePositionService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -22,14 +23,14 @@ import static lombok.AccessLevel.PRIVATE;
 public class CreatePositionServiceImpl implements CreatePositionService {
     PositionRepository positionRepository;
 
-    LoggingService loggingService;
-
     CommonRepositoryUtil commonRepositoryUtil;
     ErrorCollector       errorCollector;
+    InfoCollector        infoCollector;
 
     @Override
     public String createPosition(CreatePositionDTO createPositionDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         Position
             position = new Position(),
@@ -46,7 +47,11 @@ public class CreatePositionServiceImpl implements CreatePositionService {
         positionRepository.save(position);
 
         String operationSuccessMessage = format(InfoDescription.CREATE_POSITION_FORMAT, position.getId());
-        loggingService.logInfo(operationSuccessMessage);
+
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(position.getId(), position.getPositionName());
+        infoCollector.writeEntityLog(operationSuccessMessage);
+
         return operationSuccessMessage;
     }
 }

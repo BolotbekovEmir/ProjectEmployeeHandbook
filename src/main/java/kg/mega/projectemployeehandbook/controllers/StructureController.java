@@ -24,7 +24,7 @@ public class StructureController {
     SearchStructureService searchStructureService;
     EditStructureService   editStructureService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreateStructureDTO createStructureDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -36,7 +36,7 @@ public class StructureController {
         );
     }
 
-    @PatchMapping
+    @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody EditStructureDTO editStructureDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()

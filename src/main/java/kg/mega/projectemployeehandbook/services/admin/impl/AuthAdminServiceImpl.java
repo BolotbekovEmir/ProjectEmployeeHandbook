@@ -8,6 +8,7 @@ import kg.mega.projectemployeehandbook.models.entities.Admin;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
 import kg.mega.projectemployeehandbook.services.admin.AuthAdminService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -59,7 +60,7 @@ public class AuthAdminServiceImpl implements AuthAdminService {
     @Override
     public UserDetails loadUserByUsername(String adminName) throws UsernameNotFoundException {
         Admin admin = adminRepository.findByAdminName(adminName).orElseThrow(
-            () -> new UsernameNotFoundException(String.format("No user named '%s' was found", adminName))
+            () -> new UsernameNotFoundException(String.format("Пользователь с именем '%s' не найден", adminName))
         );
 
         return new org.springframework.security.core.userdetails.User(

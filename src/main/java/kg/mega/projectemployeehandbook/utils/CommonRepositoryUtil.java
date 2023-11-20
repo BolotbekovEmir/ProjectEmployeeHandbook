@@ -14,7 +14,7 @@ import static java.util.List.*;
 import static lombok.AccessLevel.*;
 
 /**
- * Общий утилитарный класс для выполнения общих операций с репозиториями и работы с перечислениями (enums).
+ * Общий утилитарный класс для выполнения общих операций с репозиториями и работы с перечислениями.
  */
 @Component
 @RequiredArgsConstructor

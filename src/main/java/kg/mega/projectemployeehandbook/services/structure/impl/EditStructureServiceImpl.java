@@ -9,6 +9,7 @@ import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
 import kg.mega.projectemployeehandbook.errors.ErrorCollector;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.log.LoggingService;
 import kg.mega.projectemployeehandbook.services.structure.EditStructureService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
@@ -34,11 +35,13 @@ public class EditStructureServiceImpl implements EditStructureService {
 
     CommonRepositoryUtil commonRepositoryUtil;
     ErrorCollector       errorCollector;
+    InfoCollector        infoCollector;
 
     @Override
     @Transactional
     public String editStructure(EditStructureDTO editStructureDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         Structure structure = commonRepositoryUtil.getEntityById(
             editStructureDTO.getStructureId(),
@@ -53,7 +56,11 @@ public class EditStructureServiceImpl implements EditStructureService {
         structureRepository.save(structure);
 
         String operationSuccessMessage = format(InfoDescription.EDIT_STRUCTURE_FORMAT, structure.getId());
-        loggingService.logInfo(operationSuccessMessage);
+
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(structure.getId(), structure.getStructureName());
+        infoCollector.writeFullLog(operationSuccessMessage);
+
         return operationSuccessMessage;
     }
 
@@ -83,6 +90,11 @@ public class EditStructureServiceImpl implements EditStructureService {
             );
             return false;
         } else {
+            infoCollector.addFieldUpdatesInfo(
+                    "master",
+                    structure.getMaster().getId().toString(),
+                    newMasterId.toString()
+            );
             structure.setMaster(masterStructure);
             return true;
         }
@@ -105,6 +117,11 @@ public class EditStructureServiceImpl implements EditStructureService {
             );
             return false;
         } else {
+            infoCollector.addFieldUpdatesInfo(
+                    "structureType",
+                    structure.getStructureType().getId().toString(),
+                    newStructureTypeId.toString()
+            );
             structure.setStructureType(structureType);
             return true;
         }
@@ -121,6 +138,11 @@ public class EditStructureServiceImpl implements EditStructureService {
             );
             return false;
         } else {
+            infoCollector.addFieldUpdatesInfo(
+                    "structureName",
+                    structure.getStructureName(),
+                    newStructureName
+            );
             structure.setStructureName(newStructureName);
             return true;
         }
@@ -134,6 +156,7 @@ public class EditStructureServiceImpl implements EditStructureService {
                 );
                 return false;
             } else {
+                infoCollector.addFieldUpdatesInfo("active", "true", "false");
                 structure.setActive(false);
                 return true;
             }
@@ -145,6 +168,7 @@ public class EditStructureServiceImpl implements EditStructureService {
                 );
                 return false;
             } else {
+                infoCollector.addFieldUpdatesInfo("active", "false", "true");
                 structure.setActive(true);
                 return true;
             }

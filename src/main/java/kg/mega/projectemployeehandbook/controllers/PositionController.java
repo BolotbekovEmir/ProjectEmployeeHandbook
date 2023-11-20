@@ -23,7 +23,7 @@ public class PositionController {
     SearchPositionService searchPositionService;
     EditPositionService   editPositionService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody CreatePositionDTO createPositionDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -35,7 +35,7 @@ public class PositionController {
         );
     }
 
-    @PatchMapping
+    @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody EditPositionDTO editPositionDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()

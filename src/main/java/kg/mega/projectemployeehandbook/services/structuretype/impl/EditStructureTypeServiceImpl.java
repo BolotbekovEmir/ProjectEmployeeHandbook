@@ -1,13 +1,13 @@
 package kg.mega.projectemployeehandbook.services.structuretype.impl;
 
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structuretype.EditStructureTypeDTO;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollector;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.structuretype.EditStructureTypeService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +25,15 @@ import static lombok.AccessLevel.PRIVATE;
 public class EditStructureTypeServiceImpl implements EditStructureTypeService {
     StructureTypeRepository structureTypeRepository;
 
-    LoggingService loggingService;
-
     CommonRepositoryUtil commonRepositoryUtil;
     ErrorCollector       errorCollector;
-
+    InfoCollector        infoCollector;
 
     @Override
     @Transactional
     public String editStructureType(EditStructureTypeDTO editStructureTypeDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         StructureType structureType = commonRepositoryUtil.getEntityById(
             editStructureTypeDTO.getStructureTypeId(),
@@ -49,7 +48,10 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
         structureTypeRepository.save(structureType);
 
         String operationSuccessMessage = format(InfoDescription.EDIT_STRUCTURE_TYPE_FORMAT, structureType.getId());
-        loggingService.logInfo(operationSuccessMessage);
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(structureType.getId(), structureType.getStructureTypeName());
+        infoCollector.writeFullLog(operationSuccessMessage);
+
         return operationSuccessMessage;
     }
 
@@ -70,6 +72,11 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
             );
             return false;
         }
+        infoCollector.addFieldUpdatesInfo(
+                "structureTypeName",
+                structureType.getStructureTypeName(),
+                newStructureTypeName
+        );
         structureType.setStructureTypeName(newStructureTypeName);
         return true;
     }
@@ -82,6 +89,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
                 );
                 return false;
             } else {
+                infoCollector.addFieldUpdatesInfo("active", "true", "false");
                 structureType.setActive(false);
             }
         }
@@ -92,6 +100,7 @@ public class EditStructureTypeServiceImpl implements EditStructureTypeService {
                 );
                 return false;
             } else {
+                infoCollector.addFieldUpdatesInfo("active", "false", "true");
                 structureType.setActive(true);
             }
         }

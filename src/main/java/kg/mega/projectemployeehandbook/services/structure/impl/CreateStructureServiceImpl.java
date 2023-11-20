@@ -1,5 +1,6 @@
 package kg.mega.projectemployeehandbook.services.structure.impl;
 
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.structure.CreateStructureDTO;
@@ -7,8 +8,7 @@ import kg.mega.projectemployeehandbook.models.entities.Structure;
 import kg.mega.projectemployeehandbook.models.entities.StructureType;
 import kg.mega.projectemployeehandbook.repositories.StructureRepository;
 import kg.mega.projectemployeehandbook.repositories.StructureTypeRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollector;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.structure.CreateStructureService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +25,14 @@ public class CreateStructureServiceImpl implements CreateStructureService {
     StructureTypeRepository structureTypeRepository;
     StructureRepository     structureRepository;
 
-    LoggingService loggingService;
-
     CommonRepositoryUtil commonRepositoryUtil;
     ErrorCollector       errorCollector;
+    InfoCollector        infoCollector;
 
     @Override
     public String createStructure(CreateStructureDTO createStructureDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         Structure structureMaster = commonRepositoryUtil.getEntityById(
             createStructureDTO.getMasterId(),
@@ -56,7 +56,10 @@ public class CreateStructureServiceImpl implements CreateStructureService {
         structureRepository.save(structure);
 
         String operationSuccessMessage = format(InfoDescription.CRETE_STRUCTURE_FORMAT, structure.getId());
-        loggingService.logInfo(operationSuccessMessage);
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(structure.getId(), structure.getStructureName());
+        infoCollector.writeEntityLog(operationSuccessMessage);
+
         return operationSuccessMessage;
     }
 }

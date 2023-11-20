@@ -25,7 +25,7 @@ public class AdminController {
     AuthAdminService           authAdminService;
     EditAdminService           editAdminService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody @Valid CreateAdminDTO createAdminDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
@@ -37,7 +37,7 @@ public class AdminController {
         );
     }
 
-    @PatchMapping
+    @PatchMapping("edit")
     public ResponseEntity<ApiResult> edit(@RequestBody @Valid EditAdminDTO editAdminDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()

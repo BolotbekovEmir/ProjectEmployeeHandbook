@@ -1,13 +1,13 @@
 package kg.mega.projectemployeehandbook.services.position.impl;
 
+import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.position.EditPositionDTO;
 import kg.mega.projectemployeehandbook.models.entities.Position;
 import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.PositionRepository;
-import kg.mega.projectemployeehandbook.errors.ErrorCollector;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.position.EditPositionService;
 import kg.mega.projectemployeehandbook.utils.CommonRepositoryUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
-import static java.lang.String.*;
-import static java.util.List.*;
-import static lombok.AccessLevel.*;
+import static java.lang.String.format;
+import static java.util.List.of;
+import static lombok.AccessLevel.PRIVATE;
 
 @Service
 @RequiredArgsConstructor
@@ -27,15 +27,15 @@ import static lombok.AccessLevel.*;
 public class EditPositionServiceImpl implements EditPositionService {
     PositionRepository positionRepository;
 
-    LoggingService loggingService;
-
     CommonRepositoryUtil commonRepositoryUtil;
     ErrorCollector       errorCollector;
+    InfoCollector        infoCollector;
 
     @Override
     @Transactional
     public String editPosition(EditPositionDTO editPositionDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         Position position = commonRepositoryUtil.getEntityById(
             editPositionDTO.getEditedPositionId(),
@@ -50,7 +50,10 @@ public class EditPositionServiceImpl implements EditPositionService {
         positionRepository.save(position);
 
         String operationSuccessMessage = format(InfoDescription.EDIT_POSITION_FORMAT, position.getId());
-        loggingService.logInfo(operationSuccessMessage);
+        infoCollector.setChangerInfo();
+        infoCollector.setEntityInfo(position.getId(), position.getPositionName());
+        infoCollector.writeFullLog(operationSuccessMessage);
+
         return operationSuccessMessage;
     }
 
@@ -79,6 +82,11 @@ public class EditPositionServiceImpl implements EditPositionService {
             );
             return false;
         } else {
+            infoCollector.addFieldUpdatesInfo(
+                    "master",
+                    position.getMaster().getId().toString(),
+                    newMasterId.toString()
+            );
             position.setMaster(masterPosition);
             return true;
         }
@@ -95,6 +103,11 @@ public class EditPositionServiceImpl implements EditPositionService {
             );
             return false;
         } else {
+            infoCollector.addFieldUpdatesInfo(
+                    "positionName",
+                    position.getPositionName(),
+                    newPositionName
+            );
             position.setPositionName(newPositionName);
             return true;
         }
@@ -108,6 +121,7 @@ public class EditPositionServiceImpl implements EditPositionService {
                 );
                 return false;
             } else {
+                infoCollector.addFieldUpdatesInfo("active", "true", "false");
                 position.setActive(false);
                 return true;
             }
@@ -119,6 +133,7 @@ public class EditPositionServiceImpl implements EditPositionService {
                 );
                 return false;
             } else {
+                infoCollector.addFieldUpdatesInfo("active", "false", "true");
                 position.setActive(true);
                 return true;
             }

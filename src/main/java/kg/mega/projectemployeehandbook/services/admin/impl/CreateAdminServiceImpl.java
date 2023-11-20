@@ -3,13 +3,13 @@ package kg.mega.projectemployeehandbook.services.admin.impl;
 import kg.mega.projectemployeehandbook.configuration.MapperConfiguration;
 import kg.mega.projectemployeehandbook.errors.ErrorCollector;
 import kg.mega.projectemployeehandbook.errors.messages.ErrorDescription;
-import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.errors.messages.InfoDescription;
 import kg.mega.projectemployeehandbook.models.dto.admin.CreateAdminDTO;
 import kg.mega.projectemployeehandbook.models.entities.Admin;
+import kg.mega.projectemployeehandbook.models.enums.ExceptionType;
 import kg.mega.projectemployeehandbook.repositories.AdminRepository;
 import kg.mega.projectemployeehandbook.services.admin.CreateAdminService;
-import kg.mega.projectemployeehandbook.services.log.LoggingService;
+import kg.mega.projectemployeehandbook.services.log.InfoCollector;
 import kg.mega.projectemployeehandbook.services.validation.ValidationUniqueService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,16 +29,17 @@ public class CreateAdminServiceImpl implements CreateAdminService {
     AdminRepository adminRepository;
 
     ValidationUniqueService validationUniqueService;
-    LoggingService          loggingService;
 
+    MapperConfiguration mapper;
     PasswordEncoder     passwordEncoder;
     ErrorCollector      errorCollector;
-    MapperConfiguration mapper;
+    InfoCollector       infoCollector;
 
     @Override
     @Transactional
     public String createAdmin(CreateAdminDTO createAdminDTO) {
         errorCollector.cleanup();
+        infoCollector.cleanup();
 
         isValidCreateAdminData(createAdminDTO);
 
@@ -53,9 +54,10 @@ public class CreateAdminServiceImpl implements CreateAdminService {
         admin.setPassword(passwordEncoder.encode(createAdminDTO.getPassword()));
         adminRepository.save(admin);
 
-        String operationSuccessMessage = format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getAdminName());
-        loggingService.logInfo(operationSuccessMessage);
-        return operationSuccessMessage;
+        infoCollector.setChangerInfo();
+        infoCollector.writeLog(String.format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getId()));
+
+        return format(InfoDescription.CREATE_ADMIN_FORMAT, admin.getId());
     }
 
     private void isValidCreateAdminData(CreateAdminDTO createAdminDTO) {

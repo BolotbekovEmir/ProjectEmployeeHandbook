@@ -27,7 +27,7 @@ public class EmployeeController {
     SearchEmployeeService searchEmployeeService;
     EditEmployeeService   editEmployeeService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<ApiResult> create(@RequestBody @Valid CreateEmployeeDTO createEmployeeDTO) {
         return ResponseEntity.ok().body(
             ApiResult.builder()
